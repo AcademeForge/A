@@ -1325,7 +1325,7 @@ body.af-dark[data-app-color="#000000"] .app-btn.primary {
   height: 12px;
   border-radius: 999px;
   transform: translateY(-50%);
-  background: attr(data-color color, currentColor);
+  background: currentColor;
   border: 1px solid var(--af-border);
 }
 
@@ -1368,6 +1368,53 @@ body.af-dark[data-app-color="#000000"] .app-btn.primary {
 .color-choice[data-color="#ec4899"]::before {
   background: #ec4899;
 }
+  
+/* FINAL GLOBAL APP COLOUR + HREF BUTTON FIX */
+body[data-app-color] .app-shell,
+body[data-app-color] .topbar,
+body[data-app-color] .bottom-nav,
+body[data-app-color] .card,
+body[data-app-color] .panel,
+body[data-app-color] .glass,
+body[data-app-color] .settings-list,
+body[data-app-color] .settings-support-list,
+body[data-app-color] .settings-color-wrap,
+body[data-app-color] .settings-color-panel,
+body[data-app-color] .settings-profile-card,
+body[data-app-color] .developer-credit-line,
+body[data-app-color] .form-card,
+body[data-app-color] .placeholder-card,
+body[data-app-color] .request-card,
+body[data-app-color] .page-head,
+body[data-app-color] .modal-card { border-color: var(--af-app-color-border) !important; }
+body[data-app-color] .settings-row,
+body[data-app-color] .action-card,
+body[data-app-color] .language-btn,
+body[data-app-color] .app-btn,
+body[data-app-color] .mini-btn,
+body[data-app-color] .back-btn,
+body[data-app-color] .top-icon-btn,
+body[data-app-color] .nav-btn,
+body[data-app-color] .nav-link { border-color: var(--af-app-color-border) !important; }
+body[data-app-color] .settings-row-icon,
+body[data-app-color] .action-card .icon,
+body[data-app-color] .settings-avatar { background: var(--af-app-color-soft) !important; border-color: var(--af-app-color-border) !important; }
+.settings-color-wrap { overflow:hidden; margin-bottom:12px; border-radius:22px; background:var(--af-surface); border:1px solid var(--af-border); box-shadow:var(--af-shadow-soft); }
+.settings-color-wrap > .settings-row { border-bottom:1px solid var(--af-soft-border); }
+a.settings-row, a.language-btn, a.action-card { cursor:pointer; }
+.color-choice { padding-left:26px !important; }
+.color-choice::before { background: currentColor !important; }
+.color-choice[data-color="#ffffff"] { color:#ffffff !important; text-shadow:0 0 1px #000; }
+.color-choice[data-color="#000000"] { color:#000000 !important; }
+.color-choice[data-color="#ef4444"] { color:#ef4444 !important; }
+.color-choice[data-color="#f97316"] { color:#f97316 !important; }
+.color-choice[data-color="#eab308"] { color:#eab308 !important; }
+.color-choice[data-color="#22c55e"] { color:#22c55e !important; }
+.color-choice[data-color="#06b6d4"] { color:#06b6d4 !important; }
+.color-choice[data-color="#3b82f6"] { color:#3b82f6 !important; }
+.color-choice[data-color="#8b5cf6"] { color:#8b5cf6 !important; }
+.color-choice[data-color="#ec4899"] { color:#ec4899 !important; }
+
   </style>
 </head>
 
@@ -1537,8 +1584,9 @@ body.af-dark[data-app-color="#000000"] .app-btn.primary {
       </div>
 
       <a
-        href="https://academeforge.github.io/SUPER/official/"
+        href="#"
         class="settings-beta-card"
+        onclick="handleActionHref(event, function(){ toast('Official website link is disabled in this preview.'); })"
         aria-label="Open AcademeForge official website"
       >
         <span>Official Website</span>
@@ -1565,10 +1613,10 @@ body.af-dark[data-app-color="#000000"] .app-btn.primary {
           </label>
         </div>
 
-        <button
-          type="button"
+        <a
+          href="#"
           class="settings-row"
-          onclick="navigateTo('languages')"
+          onclick="handleNavHref(event, \'languages\')"
           aria-label="Open Languages"
         >
           <div class="settings-row-left">
@@ -1579,12 +1627,12 @@ body.af-dark[data-app-color="#000000"] .app-btn.primary {
             </div>
           </div>
           <span class="settings-arrow" aria-hidden="true">›</span>
-        </button>
+        </a>
 
-        <button
-          type="button"
+        <a
+          href="#"
           class="settings-row"
-          onclick="navigateTo('explore')"
+          onclick="handleNavHref(event, \'explore\')"
           aria-label="Open AF Test Arena"
         >
           <div class="settings-row-left">
@@ -1595,12 +1643,12 @@ body.af-dark[data-app-color="#000000"] .app-btn.primary {
             </div>
           </div>
           <span class="settings-arrow" aria-hidden="true">›</span>
-        </button>
+        </a>
 
-        <button
-          type="button"
+        <a
+          href="#"
           class="settings-row"
-          onclick="navigateTo('studentaf')"
+          onclick="handleNavHref(event, \'studentaf\')"
           aria-label="Open Login/Create ID"
         >
           <div class="settings-row-left">
@@ -1613,10 +1661,10 @@ body.af-dark[data-app-color="#000000"] .app-btn.primary {
           <span class="settings-arrow" aria-hidden="true">›</span>
         </button>
 
-        <button
-          type="button"
+        <a
+          href="#"
           class="settings-row"
-          onclick="openBugReportModal()"
+          onclick="handleActionHref(event, openBugReportModal)"
           aria-label="Report a Bug"
         >
           <div class="settings-row-left">
@@ -1627,12 +1675,12 @@ body.af-dark[data-app-color="#000000"] .app-btn.primary {
             </div>
           </div>
           <span class="settings-arrow" aria-hidden="true">›</span>
-        </button>
+        </a>
 
-        <button
-          type="button"
+        <a
+          href="#"
           class="settings-row"
-          onclick="navigateTo('requestStatusAf')"
+          onclick="handleNavHref(event, \'requestStatusAf\')"
           aria-label="Open Request Status"
         >
           <div class="settings-row-left">
@@ -1643,12 +1691,12 @@ body.af-dark[data-app-color="#000000"] .app-btn.primary {
             </div>
           </div>
           <span class="settings-badge">Track</span>
-        </button>
+        </a>
 
-        <button
-          type="button"
+        <a
+          href="#"
           class="settings-row"
-          onclick="navigateTo('contactUsAf')"
+          onclick="handleNavHref(event, \'contactUsAf\')"
           aria-label="Open Contact Us"
         >
           <div class="settings-row-left">
@@ -1659,12 +1707,12 @@ body.af-dark[data-app-color="#000000"] .app-btn.primary {
             </div>
           </div>
           <span class="settings-arrow" aria-hidden="true">›</span>
-        </button>
+        </a>
 
-        <button
-          type="button"
+        <a
+          href="#"
           class="settings-row"
-          onclick="navigateTo('learningHeatmap')"
+          onclick="handleNavHref(event, \'learningHeatmap\')"
           aria-label="Open Learning Heatmap"
         >
           <div class="settings-row-left">
@@ -1675,12 +1723,12 @@ body.af-dark[data-app-color="#000000"] .app-btn.primary {
             </div>
           </div>
           <span class="settings-arrow" aria-hidden="true">›</span>
-        </button>
+        </a>
 
-        <button
-          type="button"
+        <a
+          href="#"
           class="settings-row"
-          onclick="navigateTo('notifications')"
+          onclick="handleNavHref(event, \'notifications\')"
           aria-label="Open Notifications"
         >
           <div class="settings-row-left">
@@ -1694,10 +1742,11 @@ body.af-dark[data-app-color="#000000"] .app-btn.primary {
         </button>
       </div>
 
-     <button
-  type="button"
+      <div class="settings-color-wrap">
+     <a
+  href="#"
   class="settings-row"
-  onclick="toggleFontColorPanel()"
+  onclick="handleActionHref(event, toggleFontColorPanel)"
   aria-label="Open App Colour Options"
 >
   <div class="settings-row-left">
@@ -1731,12 +1780,13 @@ body.af-dark[data-app-color="#000000"] .app-btn.primary {
     <button type="button" class="color-choice" data-color="#ec4899" onclick="setAppColor('#ec4899')">Pink</button>
   </div>
 </div>
+      </div>
       
       <div class="settings-support-list">
-        <button
-          type="button"
+        <a
+          href="#"
           class="settings-row"
-          onclick="navigateTo('management')"
+          onclick="handleNavHref(event, \'management\')"
           aria-label="Open About Us"
         >
           <div class="settings-row-left">
@@ -1749,10 +1799,10 @@ body.af-dark[data-app-color="#000000"] .app-btn.primary {
           <span class="settings-arrow" aria-hidden="true">›</span>
         </button>
 
-        <button
-          type="button"
+        <a
+          href="#"
           class="settings-row"
-          onclick="logoutStudent()"
+          onclick="handleActionHref(event, logoutStudent)"
           aria-label="Logout"
         >
           <div class="settings-row-left">
@@ -1762,7 +1812,7 @@ body.af-dark[data-app-color="#000000"] .app-btn.primary {
               <small>Clear local student session.</small>
             </div>
           </div>
-        </button>
+        </a>
       </div>
 
       <div class="settings-app-version-box">
@@ -1857,21 +1907,21 @@ body.af-dark[data-app-color="#000000"] .app-btn.primary {
       </div>
 
       <div class="language-grid">
-        <button type="button" class="language-btn" data-lang="en" onclick="setLanguage('en')">
+        <a href="#" class="language-btn" data-lang="en" onclick="handleLanguageHref(event, \'en\')">
           <span>English</span><span>EN</span>
-        </button>
-        <button type="button" class="language-btn" data-lang="hi" onclick="setLanguage('hi')">
+        </a>
+        <a href="#" class="language-btn" data-lang="hi" onclick="handleLanguageHref(event, \'hi\')">
           <span>Hindi</span><span>HI</span>
-        </button>
-        <button type="button" class="language-btn" data-lang="ur" onclick="setLanguage('ur')">
+        </a>
+        <a href="#" class="language-btn" data-lang="ur" onclick="handleLanguageHref(event, \'ur\')">
           <span>Urdu</span><span>UR</span>
-        </button>
-        <button type="button" class="language-btn" data-lang="bn" onclick="setLanguage('bn')">
+        </a>
+        <a href="#" class="language-btn" data-lang="bn" onclick="handleLanguageHref(event, \'bn\')">
           <span>Bengali</span><span>BN</span>
-        </button>
-        <button type="button" class="language-btn" data-lang="ta" onclick="setLanguage('ta')">
+        </a>
+        <a href="#" class="language-btn" data-lang="ta" onclick="handleLanguageHref(event, \'ta\')">
           <span>Tamil</span><span>TA</span>
-        </button>
+        </a>
       </div>
     </section>
 
@@ -2336,6 +2386,15 @@ function getDefaultAppColor() {
   return document.body.classList.contains("af-dark") ? "#ffffff" : "#000000";
 }
 
+function hexToRgba(hex, alpha) {
+  const safe = normalizeAppColor(hex) || "#000000";
+  const raw = safe.replace("#", "");
+  const r = parseInt(raw.slice(0, 2), 16);
+  const g = parseInt(raw.slice(2, 4), 16);
+  const b = parseInt(raw.slice(4, 6), 16);
+  return "rgba(" + r + ", " + g + ", " + b + ", " + Number(alpha || 1) + ")";
+}
+
 function getReadableButtonTextColor(bgColor) {
   const color = normalizeAppColor(bgColor) || getDefaultAppColor();
   const hex = color.replace("#", "");
@@ -2358,6 +2417,8 @@ function setAppColor(color) {
   document.documentElement.style.setProperty("--af-font-color", safeColor);
   document.documentElement.style.setProperty("--af-primary", safeColor);
   document.documentElement.style.setProperty("--af-primary-text", readableText);
+  document.documentElement.style.setProperty("--af-app-color-soft", hexToRgba(safeColor, 0.12));
+  document.documentElement.style.setProperty("--af-app-color-border", hexToRgba(safeColor, 0.42));
 
   document.body.setAttribute("data-app-color", safeColor);
 
@@ -2745,6 +2806,8 @@ function toggleFontColorPanel() {
         initKeyboardShortcuts();
       }
 
+      window.handleActionHref = function(event, fn) { if (event) event.preventDefault(); if (typeof fn === "function") fn(); };
+      window.handleLanguageHref = function(event, lang) { if (event) event.preventDefault(); setLanguage(lang); };
       window.navigateTo = navigateTo;
       window.showSection = navigateTo;
       window.goBack = goBack;
