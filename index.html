@@ -1,0 +1,2507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <meta name="theme-color" content="#ffffff" />
+  <title>AcademeForge Mobile App</title>
+
+  <style>
+    /* =========================================================
+       ACADEMEFORGE SINGLE FILE MOBILE APP
+       Extracted:
+       - Settings page + nav buttons logic from settings code
+       - Home visuals + home buttons from home code
+       Default: Black & White, lightweight, no external fonts
+    ========================================================= */
+
+    :root {
+      --af-bg: #f7f7f7;
+      --af-surface: #ffffff;
+      --af-surface-2: #f1f1f1;
+      --af-text: #000000;
+      --af-muted: #555555;
+      --af-border: #d9d9d9;
+      --af-soft-border: #eeeeee;
+      --af-primary: #000000;
+      --af-primary-text: #ffffff;
+      --af-danger: #000000;
+      --af-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
+      --af-shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.06);
+      --af-radius-xl: 24px;
+      --af-radius-lg: 18px;
+      --af-radius-md: 14px;
+      --af-nav-height: 82px;
+      --af-safe-bottom: env(safe-area-inset-bottom, 0px);
+      --af-font-color: #000000;
+    }
+
+    body.af-dark {
+      --af-bg: #000000;
+      --af-surface: #0d0d0d;
+      --af-surface-2: #171717;
+      --af-text: #ffffff;
+      --af-muted: #b5b5b5;
+      --af-border: #2a2a2a;
+      --af-soft-border: #1f1f1f;
+      --af-primary: #ffffff;
+      --af-primary-text: #000000;
+      --af-danger: #ffffff;
+      --af-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+      --af-shadow-soft: 0 8px 22px rgba(0, 0, 0, 0.36);
+      --af-font-color: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      width: 100%;
+      min-height: 100%;
+      background: var(--af-bg);
+      color: var(--af-text);
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      width: 100%;
+      min-height: 100dvh;
+      margin: 0;
+      background: var(--af-bg);
+      color: var(--af-font-color);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      text-rendering: optimizeSpeed;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    button,
+    input,
+    select,
+    textarea,
+    a {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      color: inherit;
+      background: transparent;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100dvh;
+      margin: 0 auto;
+      padding: 12px 12px calc(var(--af-nav-height) + var(--af-safe-bottom) + 24px);
+      background: var(--af-bg);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    @media (min-width: 481px) {
+      body {
+        display: flex;
+        justify-content: center;
+      }
+
+      .app-shell {
+        border-left: 1px solid var(--af-border);
+        border-right: 1px solid var(--af-border);
+      }
+    }
+
+    .section {
+      display: none;
+      width: 100%;
+      min-height: calc(100dvh - var(--af-nav-height) - 40px);
+      animation: afPageIn 0.16s ease both;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes afPageIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .glass,
+    .card,
+    .panel {
+      background: var(--af-surface);
+      border: 1px solid var(--af-border);
+      box-shadow: var(--af-shadow-soft);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: 6px 0 10px;
+      background: color-mix(in srgb, var(--af-bg) 88%, transparent);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .top-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 44px 44px;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .app-logo {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      border-radius: 13px;
+      object-fit: cover;
+      background: var(--af-surface-2);
+      border: 1px solid var(--af-border);
+    }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .brand-copy h1 {
+      margin: 0;
+      color: var(--af-text);
+      font-size: 18px;
+      line-height: 1.05;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand-copy p {
+      margin: 3px 0 0;
+      color: var(--af-muted);
+      font-size: 10px;
+      line-height: 1.15;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .top-icon-btn {
+      width: 44px;
+      height: 40px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: var(--af-surface);
+      border: 1px solid var(--af-border);
+      color: var(--af-text);
+      box-shadow: var(--af-shadow-soft);
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    .top-icon-btn:active,
+    .app-btn:active,
+    .action-card:active,
+    .settings-row:active,
+    .nav-btn:active,
+    .nav-link:active {
+      transform: scale(0.975);
+    }
+
+    /* =========================================================
+       HOME PAGE
+    ========================================================= */
+
+    .home-banner-slider {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 8.7;
+      min-height: 150px;
+      max-height: 230px;
+      border-radius: 22px;
+      overflow: hidden;
+      margin: 8px 0 12px;
+      background: var(--af-surface);
+      touch-action: pan-y;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .banner-slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: opacity 0.28s ease, transform 0.36s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .banner-slide.active {
+      opacity: 1;
+      transform: translateX(0);
+      z-index: 2;
+    }
+
+    .banner-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+      -webkit-user-drag: none;
+      background: var(--af-surface-2);
+    }
+
+    .banner-dots {
+      position: absolute;
+      left: 50%;
+      bottom: 10px;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--af-surface) 82%, transparent);
+      border: 1px solid var(--af-border);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .banner-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      padding: 0;
+      background: var(--af-muted);
+      opacity: 0.45;
+      transition: all 0.18s ease;
+    }
+
+    .banner-dot.active {
+      width: 20px;
+      opacity: 1;
+      background: var(--af-text);
+    }
+
+    .moving-text-banner {
+      width: 100%;
+      height: 36px;
+      border-radius: 15px;
+      margin: 0 0 12px;
+      overflow: hidden;
+      white-space: nowrap;
+      background: var(--af-surface);
+      border: 1px solid var(--af-border);
+      box-shadow: var(--af-shadow-soft);
+    }
+
+    .moving-text-track {
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      gap: 28px;
+      width: max-content;
+      min-width: max-content;
+      animation: afMarqueeMove 20s linear infinite;
+      will-change: transform;
+    }
+
+    .moving-text-track span {
+      display: inline-block;
+      flex: 0 0 auto;
+      font-size: 11px;
+      line-height: 1;
+      font-weight: 800;
+      color: var(--af-muted);
+      white-space: nowrap;
+    }
+
+    @keyframes afMarqueeMove {
+      0% {
+        transform: translate3d(0, 0, 0);
+      }
+      100% {
+        transform: translate3d(-50%, 0, 0);
+      }
+    }
+
+    .actions {
+      display: grid;
+      gap: 10px;
+      margin: 0 0 10px;
+    }
+
+    .home-login-actions {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .home-extra-actions {
+      grid-template-columns: 1fr;
+    }
+
+    .action-card {
+      width: 100%;
+      min-width: 0;
+      min-height: 104px;
+      padding: 12px;
+      border-radius: 21px;
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      text-align: left;
+      color: var(--af-text);
+      overflow: hidden;
+      transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
+      background: var(--af-surface);
+      border: 1px solid var(--af-border);
+      box-shadow: var(--af-shadow-soft);
+    }
+
+    .action-card.wide {
+      min-height: 92px;
+      align-items: center;
+    }
+
+    .action-card .icon {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: var(--af-surface-2);
+      color: var(--af-text);
+      font-size: 18px;
+      line-height: 1;
+      border: 1px solid var(--af-soft-border);
+    }
+
+    .action-card h3 {
+      margin: 2px 0 5px;
+      font-size: 14px;
+      line-height: 1.15;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: var(--af-text);
+    }
+
+    .action-card p {
+      margin: 0;
+      font-size: 10.5px;
+      line-height: 1.35;
+      font-weight: 700;
+      color: var(--af-muted);
+    }
+
+    .developer-credit-line {
+      margin: 14px auto 0;
+      padding: 14px 16px;
+      border-radius: 20px;
+      background: var(--af-surface);
+      border: 1px solid var(--af-border);
+      text-align: center;
+      box-shadow: var(--af-shadow-soft);
+    }
+
+    .developer-credit-line span {
+      display: block;
+      font-size: 12px;
+      line-height: 1.25;
+      font-weight: 900;
+      color: var(--af-text);
+    }
+
+    .developer-credit-line small {
+      display: block;
+      margin-top: 5px;
+      font-size: 11px;
+      line-height: 1.35;
+      font-weight: 700;
+      color: var(--af-muted);
+    }
+
+    /* =========================================================
+       COMMON PAGE HEADER + BUTTONS
+    ========================================================= */
+
+    .page-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 4px 0 12px;
+      padding: 14px;
+      border-radius: 20px;
+      background: var(--af-surface);
+      border: 1px solid var(--af-border);
+      box-shadow: var(--af-shadow-soft);
+    }
+
+    .page-head h2 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      color: var(--af-text);
+    }
+
+    .page-head p {
+      margin: 4px 0 0;
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 700;
+      color: var(--af-muted);
+    }
+
+    .back-btn,
+    .app-btn,
+    .mini-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 42px;
+      border-radius: 14px;
+      padding: 10px 13px;
+      background: var(--af-surface-2);
+      border: 1px solid var(--af-border);
+      color: var(--af-text);
+      font-weight: 900;
+      line-height: 1;
+      transition: transform 0.14s ease;
+    }
+
+    .back-btn {
+      min-width: 42px;
+      padding: 10px 12px;
+      white-space: nowrap;
+    }
+
+    .app-btn.primary {
+      width: 100%;
+      min-height: 48px;
+      background: var(--af-primary);
+      color: var(--af-primary-text);
+      border-color: var(--af-primary);
+    }
+
+    .placeholder-card {
+      padding: 18px;
+      border-radius: 22px;
+      background: var(--af-surface);
+      border: 1px solid var(--af-border);
+      box-shadow: var(--af-shadow-soft);
+    }
+
+    .placeholder-card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      color: var(--af-text);
+    }
+
+    .placeholder-card p {
+      margin: 0;
+      color: var(--af-muted);
+      font-size: 13px;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    /* =========================================================
+       SETTINGS PAGE
+    ========================================================= */
+
+    .settings-profile-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border-radius: 22px;
+      background: var(--af-surface);
+      border: 1px solid var(--af-border);
+      box-shadow: var(--af-shadow-soft);
+    }
+
+    .settings-avatar {
+      display: grid;
+      place-items: center;
+      width: 54px;
+      height: 54px;
+      min-width: 54px;
+      border-radius: 16px;
+      background: var(--af-surface-2);
+      border: 1px solid var(--af-soft-border);
+      color: var(--af-text);
+      font-size: 25px;
+    }
+
+    .settings-profile-info {
+      min-width: 0;
+    }
+
+    .settings-profile-info h2 {
+      margin: 0 0 6px;
+      color: var(--af-text);
+      font-size: 22px;
+      line-height: 1.1;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .settings-profile-link {
+      padding: 0;
+      color: var(--af-muted);
+      font-size: 13px;
+      font-weight: 800;
+      text-align: left;
+    }
+
+    .settings-beta-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 15px 16px;
+      margin-bottom: 12px;
+      border-radius: 20px;
+      background: var(--af-primary);
+      color: var(--af-primary-text);
+      border: 1px solid var(--af-primary);
+      box-shadow: var(--af-shadow-soft);
+      font-weight: 900;
+    }
+
+    .settings-list,
+    .settings-support-list,
+    .settings-color-panel {
+      overflow: hidden;
+      margin-bottom: 12px;
+      border-radius: 22px;
+      background: var(--af-surface);
+      border: 1px solid var(--af-border);
+      box-shadow: var(--af-shadow-soft);
+    }
+
+    .settings-row {
+      width: 100%;
+      min-height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--af-surface);
+      color: var(--af-text);
+      border-bottom: 1px solid var(--af-soft-border);
+      text-align: left;
+      transition: transform 0.14s ease, background 0.14s ease;
+    }
+
+    .settings-row:last-child {
+      border-bottom: 0;
+    }
+
+    .settings-row-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      font-weight: 900;
+    }
+
+    .settings-row-icon {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      min-width: 34px;
+      border-radius: 12px;
+      background: var(--af-surface-2);
+      border: 1px solid var(--af-soft-border);
+      color: var(--af-text);
+      font-size: 15px;
+    }
+
+    .settings-row-title {
+      min-width: 0;
+    }
+
+    .settings-row-title strong {
+      display: block;
+      font-size: 14px;
+      line-height: 1.2;
+      color: var(--af-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .settings-row-title small {
+      display: block;
+      margin-top: 3px;
+      color: var(--af-muted);
+      font-size: 11px;
+      line-height: 1.25;
+      font-weight: 700;
+    }
+
+    .settings-arrow {
+      font-size: 24px;
+      color: var(--af-muted);
+      line-height: 1;
+      min-width: 14px;
+      text-align: right;
+    }
+
+    .settings-badge {
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: var(--af-surface-2);
+      color: var(--af-muted);
+      border: 1px solid var(--af-soft-border);
+      font-size: 11px;
+      line-height: 1;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .settings-switch {
+      position: relative;
+      width: 50px;
+      height: 28px;
+      flex: 0 0 auto;
+    }
+
+    .settings-switch input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .settings-slider {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: var(--af-surface-2);
+      border: 1px solid var(--af-border);
+      transition: 0.16s ease;
+    }
+
+    .settings-slider::before {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      left: 2px;
+      top: 2px;
+      border-radius: 50%;
+      background: var(--af-muted);
+      transition: 0.16s ease;
+    }
+
+    .settings-switch input:checked + .settings-slider {
+      background: var(--af-primary);
+      border-color: var(--af-primary);
+    }
+
+    .settings-switch input:checked + .settings-slider::before {
+      transform: translateX(22px);
+      background: var(--af-primary-text);
+    }
+
+    .settings-color-panel {
+      padding: 14px;
+    }
+
+    .settings-color-panel h3 {
+      margin: 0 0 4px;
+      font-size: 15px;
+      color: var(--af-text);
+    }
+
+    .settings-color-panel p {
+      margin: 0 0 12px;
+      font-size: 12px;
+      color: var(--af-muted);
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .color-choice {
+      min-height: 42px;
+      border-radius: 14px;
+      border: 1px solid var(--af-border);
+      background: var(--af-surface-2);
+      color: var(--af-text);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .color-choice.active {
+      outline: 2px solid var(--af-text);
+      outline-offset: 2px;
+    }
+
+    .settings-app-version-box {
+      padding: 15px 16px;
+      text-align: center;
+      border-radius: 20px;
+      background: var(--af-surface);
+      border: 1px solid var(--af-border);
+      box-shadow: var(--af-shadow-soft);
+    }
+
+    .settings-app-version-box strong {
+      display: block;
+      color: var(--af-text);
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    .settings-app-version-box span {
+      display: block;
+      margin-top: 5px;
+      color: var(--af-muted);
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    /* =========================================================
+       CONTACT / STATUS / LANGUAGE PAGES
+    ========================================================= */
+
+    .form-card {
+      padding: 16px;
+      border-radius: 22px;
+      background: var(--af-surface);
+      border: 1px solid var(--af-border);
+      box-shadow: var(--af-shadow-soft);
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      color: var(--af-muted);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      border: 1px solid var(--af-border);
+      border-radius: 14px;
+      background: var(--af-surface-2);
+      color: var(--af-text);
+      padding: 12px;
+      outline: 0;
+      font-weight: 700;
+    }
+
+    .field textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .status-message {
+      display: none;
+      margin: 12px 0;
+      padding: 12px;
+      border-radius: 14px;
+      background: var(--af-surface-2);
+      color: var(--af-muted);
+      border: 1px solid var(--af-soft-border);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .status-message.show {
+      display: block;
+    }
+
+    .request-card {
+      padding: 14px;
+      margin-bottom: 10px;
+      border-radius: 18px;
+      background: var(--af-surface);
+      border: 1px solid var(--af-border);
+      box-shadow: var(--af-shadow-soft);
+    }
+
+    .request-card h3 {
+      margin: 0 0 5px;
+      color: var(--af-text);
+      font-size: 15px;
+    }
+
+    .request-card p {
+      margin: 0;
+      color: var(--af-muted);
+      font-size: 12px;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .language-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .language-btn {
+      width: 100%;
+      min-height: 54px;
+      padding: 13px 14px;
+      border-radius: 16px;
+      background: var(--af-surface);
+      border: 1px solid var(--af-border);
+      color: var(--af-text);
+      box-shadow: var(--af-shadow-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-weight: 900;
+    }
+
+    .language-btn.active {
+      background: var(--af-primary);
+      color: var(--af-primary-text);
+      border-color: var(--af-primary);
+    }
+
+    /* =========================================================
+       MODAL / TOAST
+    ========================================================= */
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 400;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, 0.58);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-card {
+      width: min(100%, 430px);
+      padding: 18px;
+      border-radius: 22px;
+      background: var(--af-surface);
+      border: 1px solid var(--af-border);
+      box-shadow: var(--af-shadow);
+      color: var(--af-text);
+    }
+
+    .modal-card h3 {
+      margin: 0 0 6px;
+      font-size: 20px;
+      letter-spacing: -0.03em;
+    }
+
+    .modal-card p {
+      margin: 0 0 14px;
+      color: var(--af-muted);
+      font-size: 13px;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(var(--af-nav-height) + var(--af-safe-bottom) + 18px);
+      transform: translateX(-50%);
+      z-index: 500;
+      display: none;
+      width: min(calc(100vw - 24px), 420px);
+      padding: 12px 14px;
+      border-radius: 15px;
+      background: var(--af-surface);
+      border: 1px solid var(--af-border);
+      box-shadow: var(--af-shadow);
+      color: var(--af-text);
+      font-size: 13px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .toast.show {
+      display: block;
+      animation: afToastIn 0.16s ease both;
+    }
+
+    @keyframes afToastIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, 8px);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+    }
+
+    /* =========================================================
+       BOTTOM NAV
+       Home + Settings = button navigation.
+       Student/Batches/Community = href="#" style anchors.
+    ========================================================= */
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      bottom: max(8px, var(--af-safe-bottom));
+      transform: translateX(-50%);
+      z-index: 300;
+      width: min(460px, calc(100vw - 8px));
+      height: var(--af-nav-height);
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      align-items: center;
+      gap: 0;
+      padding: 6px;
+      border-radius: 26px;
+      overflow: hidden;
+      background: color-mix(in srgb, var(--af-surface) 96%, transparent);
+      border: 1px solid var(--af-border);
+      box-shadow: var(--af-shadow);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .nav-btn,
+    .nav-link {
+      width: 100%;
+      height: 70px;
+      min-width: 0;
+      margin: 0;
+      padding: 0;
+      border-radius: 21px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--af-muted);
+      background: transparent;
+      border: 1px solid transparent;
+      font-size: 11px;
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      transition: transform 0.14s ease, background 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+    }
+
+    .nav-icon {
+      width: 18px;
+      height: 18px;
+      display: grid;
+      place-items: center;
+      color: currentColor;
+    }
+
+    .nav-icon svg {
+      width: 17px;
+      height: 17px;
+      display: block;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .nav-btn.active,
+    .nav-link.active {
+      background: var(--af-surface);
+      color: var(--af-text);
+      border-color: var(--af-border);
+      box-shadow: var(--af-shadow-soft);
+    }
+
+    body.af-dark .nav-btn.active,
+    body.af-dark .nav-link.active {
+      background: var(--af-surface-2);
+    }
+
+    @media (max-width: 380px) {
+      .app-shell {
+        padding-left: 9px;
+        padding-right: 9px;
+      }
+
+      .top-row {
+        grid-template-columns: minmax(0, 1fr) 42px 42px;
+        gap: 6px;
+      }
+
+      .app-logo {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        border-radius: 12px;
+      }
+
+      .brand-copy h1 {
+        font-size: 16px;
+      }
+
+      .brand-copy p {
+        font-size: 8.8px;
+      }
+
+      .top-icon-btn {
+        width: 42px;
+        height: 38px;
+      }
+
+      .home-login-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .home-banner-slider {
+        min-height: 138px;
+      }
+
+      .action-card {
+        min-height: 88px;
+        align-items: center;
+      }
+
+      .bottom-nav {
+        width: calc(100vw - 6px);
+        height: 78px;
+        padding: 5px;
+        border-radius: 24px;
+      }
+
+      .nav-btn,
+      .nav-link {
+        height: 66px;
+        border-radius: 19px;
+        gap: 7px;
+        font-size: 10px;
+      }
+
+      .nav-icon,
+      .nav-icon svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .color-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="top-row">
+        <div class="brand">
+          <img
+            src="AF LOGO 1.jpeg"
+            class="app-logo"
+            alt="AcademeForge Logo"
+            onerror="this.style.display='none'"
+          />
+          <div class="brand-copy">
+            <h1>AcademeForge</h1>
+            <p>Learning Beyond the Classroom</p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="top-icon-btn"
+          onclick="navigateTo('learningHeatmap')"
+          aria-label="Open learning streak"
+        >
+          <span aria-hidden="true">↯</span>
+        </button>
+
+        <button
+          type="button"
+          class="top-icon-btn"
+          onclick="navigateTo('notifications')"
+          aria-label="Open notifications"
+        >
+          <span aria-hidden="true">!</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- =========================================================
+         HOME
+    ========================================================== -->
+    <section id="home" class="section active" aria-label="Home page">
+      <div class="home-banner-slider glass" id="homeBannerSlider">
+        <div class="banner-slide active">
+          <img src="banner1.png" alt="AcademeForge Banner 1" />
+        </div>
+
+        <div class="banner-slide">
+          <img src="banner2.png" alt="AcademeForge Banner 2" />
+        </div>
+
+        <div class="banner-slide">
+          <img src="Banner3.png" alt="AcademeForge Banner 3" />
+        </div>
+
+        <div class="banner-dots" aria-label="Banner controls">
+          <button
+            type="button"
+            class="banner-dot active"
+            onclick="goToBannerSlide(0)"
+            aria-label="Banner 1"
+          ></button>
+
+          <button
+            type="button"
+            class="banner-dot"
+            onclick="goToBannerSlide(1)"
+            aria-label="Banner 2"
+          ></button>
+
+          <button
+            type="button"
+            class="banner-dot"
+            onclick="goToBannerSlide(2)"
+            aria-label="Banner 3"
+          ></button>
+        </div>
+      </div>
+
+      <div class="moving-text-banner">
+        <div class="moving-text-track">
+          <span>This is only a preview of the app. The original app may include more features and functions.</span>
+          <span>AcademeForge is being improved for a faster and cleaner mobile learning experience.</span>
+          <span>This is only a preview of the app. The original app may include more features and functions.</span>
+          <span>AcademeForge is being improved for a faster and cleaner mobile learning experience.</span>
+        </div>
+      </div>
+
+      <div class="actions home-login-actions">
+        <button
+          type="button"
+          class="action-card"
+          onclick="navigateTo('studentaf')"
+        >
+          <div class="icon" aria-hidden="true">S</div>
+          <div>
+            <h3>Student Login</h3>
+            <p>Access your course dashboard.</p>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          class="action-card"
+          onclick="openStudentProfile()"
+        >
+          <div class="icon" aria-hidden="true">P</div>
+          <div>
+            <h3 id="studentDashboardCardNameAf">Hi, Student</h3>
+            <p id="studentDashboardCardSubAf">Login to view profile.</p>
+          </div>
+        </button>
+      </div>
+
+      <div class="actions home-extra-actions">
+        <button
+          type="button"
+          class="action-card wide"
+          onclick="navigateTo('explore')"
+        >
+          <div class="icon" aria-hidden="true">A</div>
+          <div>
+            <h3>AF Test Arena</h3>
+            <p>Attempt quizzes and check your ranking.</p>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          class="action-card wide"
+          onclick="navigateTo('management')"
+        >
+          <div class="icon" aria-hidden="true">i</div>
+          <div>
+            <h3>About Us</h3>
+            <p>Know the story behind AcademeForge.</p>
+          </div>
+        </button>
+      </div>
+
+      <div class="developer-credit-line">
+        <span>This is only a preview of the app. The original app may include more features and functions.</span>
+        <small>Developed by Devraj Kumar. Made with care in India.</small>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SETTINGS
+    ========================================================== -->
+    <section id="settings" class="section settings-section" aria-label="Settings page">
+      <div class="settings-profile-card">
+        <div class="settings-avatar" aria-hidden="true">A</div>
+
+        <div class="settings-profile-info">
+          <h2 id="settingsStudentName">Hi, Student</h2>
+          <button
+            type="button"
+            class="settings-profile-link"
+            onclick="openStudentProfile()"
+            aria-label="View profile"
+          >
+            View profile
+          </button>
+        </div>
+      </div>
+
+      <a
+        href="https://academeforge.github.io/SUPER/official/"
+        class="settings-beta-card"
+        aria-label="Open AcademeForge official website"
+      >
+        <span>Official Website</span>
+        <span aria-hidden="true">›</span>
+      </a>
+
+      <div class="settings-list">
+        <div class="settings-row">
+          <div class="settings-row-left">
+            <span class="settings-row-icon" aria-hidden="true">◐</span>
+            <div class="settings-row-title">
+              <strong>Night Mode</strong>
+              <small>Switch between black and white reading mode.</small>
+            </div>
+          </div>
+
+          <label class="settings-switch" for="settingsDarkToggle" aria-label="Toggle dark mode">
+            <input
+              id="settingsDarkToggle"
+              type="checkbox"
+              onchange="toggleDarkMode(this.checked)"
+            />
+            <span class="settings-slider" aria-hidden="true"></span>
+          </label>
+        </div>
+
+        <button
+          type="button"
+          class="settings-row"
+          onclick="navigateTo('languages')"
+          aria-label="Open Languages"
+        >
+          <div class="settings-row-left">
+            <span class="settings-row-icon" aria-hidden="true">L</span>
+            <div class="settings-row-title">
+              <strong>Languages</strong>
+              <small>Choose app language preference.</small>
+            </div>
+          </div>
+          <span class="settings-arrow" aria-hidden="true">›</span>
+        </button>
+
+        <button
+          type="button"
+          class="settings-row"
+          onclick="navigateTo('explore')"
+          aria-label="Open AF Test Arena"
+        >
+          <div class="settings-row-left">
+            <span class="settings-row-icon" aria-hidden="true">T</span>
+            <div class="settings-row-title">
+              <strong>AF Test Arena</strong>
+              <small>Open quizzes and ranking section.</small>
+            </div>
+          </div>
+          <span class="settings-arrow" aria-hidden="true">›</span>
+        </button>
+
+        <button
+          type="button"
+          class="settings-row"
+          onclick="navigateTo('studentaf')"
+          aria-label="Open Login/Create ID"
+        >
+          <div class="settings-row-left">
+            <span class="settings-row-icon" aria-hidden="true">ID</span>
+            <div class="settings-row-title">
+              <strong>Login/Create ID</strong>
+              <small>Access student login and profile.</small>
+            </div>
+          </div>
+          <span class="settings-arrow" aria-hidden="true">›</span>
+        </button>
+
+        <button
+          type="button"
+          class="settings-row"
+          onclick="openBugReportModal()"
+          aria-label="Report a Bug"
+        >
+          <div class="settings-row-left">
+            <span class="settings-row-icon" aria-hidden="true">B</span>
+            <div class="settings-row-title">
+              <strong>Report a Bug</strong>
+              <small>Send a technical issue report.</small>
+            </div>
+          </div>
+          <span class="settings-arrow" aria-hidden="true">›</span>
+        </button>
+
+        <button
+          type="button"
+          class="settings-row"
+          onclick="navigateTo('requestStatusAf')"
+          aria-label="Open Request Status"
+        >
+          <div class="settings-row-left">
+            <span class="settings-row-icon" aria-hidden="true">R</span>
+            <div class="settings-row-title">
+              <strong>Request Status</strong>
+              <small>Track bug reports and support requests.</small>
+            </div>
+          </div>
+          <span class="settings-badge">Track</span>
+        </button>
+
+        <button
+          type="button"
+          class="settings-row"
+          onclick="navigateTo('contactUsAf')"
+          aria-label="Open Contact Us"
+        >
+          <div class="settings-row-left">
+            <span class="settings-row-icon" aria-hidden="true">C</span>
+            <div class="settings-row-title">
+              <strong>Contact Us</strong>
+              <small>Request a call or email reply.</small>
+            </div>
+          </div>
+          <span class="settings-arrow" aria-hidden="true">›</span>
+        </button>
+
+        <button
+          type="button"
+          class="settings-row"
+          onclick="navigateTo('learningHeatmap')"
+          aria-label="Open Learning Heatmap"
+        >
+          <div class="settings-row-left">
+            <span class="settings-row-icon" aria-hidden="true">H</span>
+            <div class="settings-row-title">
+              <strong>Learning Heatmap</strong>
+              <small>Check weekly learning activity.</small>
+            </div>
+          </div>
+          <span class="settings-arrow" aria-hidden="true">›</span>
+        </button>
+
+        <button
+          type="button"
+          class="settings-row"
+          onclick="navigateTo('notifications')"
+          aria-label="Open Notifications"
+        >
+          <div class="settings-row-left">
+            <span class="settings-row-icon" aria-hidden="true">N</span>
+            <div class="settings-row-title">
+              <strong>Notifications</strong>
+              <small>View important app updates.</small>
+            </div>
+          </div>
+          <span class="settings-badge">New</span>
+        </button>
+      </div>
+
+      <div class="settings-color-panel">
+        <h3>Font Colour</h3>
+        <p>Default is black and white. Choose a temporary font colour if needed.</p>
+
+        <div class="color-grid">
+          <button type="button" class="color-choice" data-color="#000000" onclick="setFontColor('#000000')">Black</button>
+          <button type="button" class="color-choice" data-color="#ffffff" onclick="setFontColor('#ffffff')">White</button>
+          <button type="button" class="color-choice" data-color="#1f2937" onclick="setFontColor('#1f2937')">Slate</button>
+          <button type="button" class="color-choice" data-color="#374151" onclick="setFontColor('#374151')">Gray</button>
+          <button type="button" class="color-choice" data-color="#991b1b" onclick="setFontColor('#991b1b')">Red</button>
+          <button type="button" class="color-choice" data-color="#92400e" onclick="setFontColor('#92400e')">Amber</button>
+          <button type="button" class="color-choice" data-color="#166534" onclick="setFontColor('#166534')">Green</button>
+          <button type="button" class="color-choice" data-color="#1e40af" onclick="setFontColor('#1e40af')">Blue</button>
+          <button type="button" class="color-choice" data-color="#6d28d9" onclick="setFontColor('#6d28d9')">Violet</button>
+          <button type="button" class="color-choice" data-color="#be185d" onclick="setFontColor('#be185d')">Pink</button>
+        </div>
+      </div>
+
+      <div class="settings-support-list">
+        <button
+          type="button"
+          class="settings-row"
+          onclick="navigateTo('management')"
+          aria-label="Open About Us"
+        >
+          <div class="settings-row-left">
+            <span class="settings-row-icon" aria-hidden="true">i</span>
+            <div class="settings-row-title">
+              <strong>About Us</strong>
+              <small>Learn more about AcademeForge.</small>
+            </div>
+          </div>
+          <span class="settings-arrow" aria-hidden="true">›</span>
+        </button>
+
+        <button
+          type="button"
+          class="settings-row"
+          onclick="logoutStudent()"
+          aria-label="Logout"
+        >
+          <div class="settings-row-left">
+            <span class="settings-row-icon" aria-hidden="true">↩</span>
+            <div class="settings-row-title">
+              <strong>Logout</strong>
+              <small>Clear local student session.</small>
+            </div>
+          </div>
+        </button>
+      </div>
+
+      <div class="settings-app-version-box">
+        <strong>App Version: 09.01.2024</strong>
+        <span>Developed by Devraj Kumar. Made with care in India.</span>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         CONTACT US
+    ========================================================== -->
+    <section id="contactUsAf" class="section" aria-label="Contact Us">
+      <div class="page-head">
+        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
+        <div>
+          <h2>Contact Us</h2>
+          <p>Request a call or email reply from the support team.</p>
+        </div>
+      </div>
+
+      <form class="form-card" id="contactUsFormAf" onsubmit="submitContactRequest(event)">
+        <div class="field">
+          <label for="contactNameAf">Full Name</label>
+          <input id="contactNameAf" type="text" maxlength="80" autocomplete="name" required />
+        </div>
+
+        <div class="field">
+          <label for="contactMobileAf">Mobile Number</label>
+          <input id="contactMobileAf" type="tel" maxlength="15" autocomplete="tel" required />
+        </div>
+
+        <div class="field">
+          <label for="contactEmailAf">Email Address</label>
+          <input id="contactEmailAf" type="email" maxlength="120" autocomplete="email" required />
+        </div>
+
+        <div class="field">
+          <label for="contactReasonAf">Reason for Contact</label>
+          <select id="contactReasonAf" required>
+            <option value="">Select a reason</option>
+            <option value="Course Access Issue">Course Access Issue</option>
+            <option value="Login or Student ID Issue">Login or Student ID Issue</option>
+            <option value="Payment or Enrollment Query">Payment or Enrollment Query</option>
+            <option value="Technical Problem">Technical Problem</option>
+            <option value="General Support">General Support</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="contactProblemAf">Describe Your Problem</label>
+          <textarea id="contactProblemAf" maxlength="1200" required></textarea>
+        </div>
+
+        <div id="contactUsMessageAf" class="status-message" aria-live="polite"></div>
+
+        <button type="submit" class="app-btn primary" id="contactSubmitBtnAf">
+          Submit Request
+        </button>
+      </form>
+    </section>
+
+    <!-- =========================================================
+         REQUEST STATUS
+    ========================================================== -->
+    <section id="requestStatusAf" class="section" aria-label="Request Status">
+      <div class="page-head">
+        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
+        <div>
+          <h2>Request Status</h2>
+          <p>Track your support requests and bug reports.</p>
+        </div>
+        <button type="button" class="mini-btn" onclick="loadRequestStatus(true)" aria-label="Refresh">↻</button>
+      </div>
+
+      <div id="requestStatusMessageAf" class="status-message show">
+        No live backend connected in this preview. Your local demo requests will appear below.
+      </div>
+
+      <div id="requestStatusListAf"></div>
+    </section>
+
+    <!-- =========================================================
+         LANGUAGES
+    ========================================================== -->
+    <section id="languages" class="section" aria-label="Languages">
+      <div class="page-head">
+        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
+        <div>
+          <h2>Languages</h2>
+          <p>Select your preferred app language.</p>
+        </div>
+      </div>
+
+      <div class="language-grid">
+        <button type="button" class="language-btn" data-lang="en" onclick="setLanguage('en')">
+          <span>English</span><span>EN</span>
+        </button>
+        <button type="button" class="language-btn" data-lang="hi" onclick="setLanguage('hi')">
+          <span>Hindi</span><span>HI</span>
+        </button>
+        <button type="button" class="language-btn" data-lang="ur" onclick="setLanguage('ur')">
+          <span>Urdu</span><span>UR</span>
+        </button>
+        <button type="button" class="language-btn" data-lang="bn" onclick="setLanguage('bn')">
+          <span>Bengali</span><span>BN</span>
+        </button>
+        <button type="button" class="language-btn" data-lang="ta" onclick="setLanguage('ta')">
+          <span>Tamil</span><span>TA</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         OTHER PAGES
+    ========================================================== -->
+    <section id="studentaf" class="section" aria-label="Student">
+      <div class="page-head">
+        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
+        <div>
+          <h2>Student</h2>
+          <p>Student login and profile access page.</p>
+        </div>
+      </div>
+
+      <div class="placeholder-card">
+        <h3>Student Area</h3>
+        <p>This section is ready for your existing student login/dashboard code.</p>
+      </div>
+    </section>
+
+    <section id="batchaf" class="section" aria-label="Batches">
+      <div class="page-head">
+        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
+        <div>
+          <h2>Batches</h2>
+          <p>Batch list and enrolled course details.</p>
+        </div>
+      </div>
+
+      <div class="placeholder-card">
+        <h3>Batches</h3>
+        <p>This section is ready for your existing batches page code.</p>
+      </div>
+    </section>
+
+    <section id="community" class="section" aria-label="Community">
+      <div class="page-head">
+        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
+        <div>
+          <h2>Community</h2>
+          <p>Community discussion and updates page.</p>
+        </div>
+      </div>
+
+      <div class="placeholder-card">
+        <h3>Community</h3>
+        <p>This section is ready for your existing community page code.</p>
+      </div>
+    </section>
+
+    <section id="explore" class="section" aria-label="AF Test Arena">
+      <div class="page-head">
+        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
+        <div>
+          <h2>AF Test Arena</h2>
+          <p>Quiz, test and ranking area.</p>
+        </div>
+      </div>
+
+      <div class="placeholder-card">
+        <h3>AF Test Arena</h3>
+        <p>This section is ready for your quiz/test arena code.</p>
+      </div>
+    </section>
+
+    <section id="management" class="section" aria-label="About Us">
+      <div class="page-head">
+        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
+        <div>
+          <h2>About Us</h2>
+          <p>AcademeForge information page.</p>
+        </div>
+      </div>
+
+      <div class="placeholder-card">
+        <h3>AcademeForge</h3>
+        <p>AcademeForge is built to support students with a cleaner, faster and more focused learning experience.</p>
+      </div>
+    </section>
+
+    <section id="learningHeatmap" class="section" aria-label="Learning Heatmap">
+      <div class="page-head">
+        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
+        <div>
+          <h2>Learning Heatmap</h2>
+          <p>Weekly online learning activity.</p>
+        </div>
+      </div>
+
+      <div class="placeholder-card">
+        <h3>This Week</h3>
+        <p>Login daily to keep your learning streak active. Backend sync can be connected here.</p>
+      </div>
+    </section>
+
+    <section id="notifications" class="section" aria-label="Notifications">
+      <div class="page-head">
+        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
+        <div>
+          <h2>Notifications</h2>
+          <p>Important updates and alerts.</p>
+        </div>
+      </div>
+
+      <div class="placeholder-card">
+        <h3>No new notifications</h3>
+        <p>Notifications from your backend can be rendered in this section.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- =========================================================
+       BOTTOM NAVIGATION
+  ========================================================== -->
+  <nav class="bottom-nav" aria-label="Bottom navigation">
+    <button
+      type="button"
+      class="nav-btn active"
+      data-section="home"
+      onclick="navigateTo('home')"
+      aria-label="Home"
+    >
+      <span class="nav-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-5h5v5"/></svg>
+      </span>
+      <span>Home</span>
+    </button>
+
+    <a
+      href="#"
+      class="nav-link"
+      data-section="studentaf"
+      onclick="handleNavHref(event, 'studentaf')"
+      aria-label="Student"
+    >
+      <span class="nav-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M4 9 12 5l8 4-8 4-8-4Z"/><path d="M7 11.5V16c0 1.3 2.2 2.5 5 2.5s5-1.2 5-2.5v-4.5"/></svg>
+      </span>
+      <span>Student</span>
+    </a>
+
+    <a
+      href="#"
+      class="nav-link"
+      data-section="batchaf"
+      onclick="handleNavHref(event, 'batchaf')"
+      aria-label="Batches"
+    >
+      <span class="nav-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4Z"/><path d="M8 4v16"/><path d="M11 8h5"/><path d="M11 12h5"/></svg>
+      </span>
+      <span>Batches</span>
+    </a>
+
+    <a
+      href="#"
+      class="nav-link"
+      data-section="community"
+      onclick="handleNavHref(event, 'community')"
+      aria-label="Community"
+    >
+      <span class="nav-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M7 10a4 4 0 1 1 8 0"/><path d="M3.5 20a7.5 7.5 0 0 1 15 0"/><path d="M17 9.5a3 3 0 0 1 0 6"/><path d="M19 20a5 5 0 0 0-2.5-4.3"/></svg>
+      </span>
+      <span>Community</span>
+    </a>
+
+    <button
+      type="button"
+      class="nav-btn"
+      data-section="settings"
+      onclick="navigateTo('settings')"
+      aria-label="Settings"
+    >
+      <span class="nav-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M19 12a7.3 7.3 0 0 0-.1-1.2l2-1.5-2-3.5-2.4 1a7 7 0 0 0-2-1.2L14.2 3h-4.4l-.3 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.5 2 1.5A7.3 7.3 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.5 2.4-1a7 7 0 0 0 2 1.2l.3 2.6h4.4l.3-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.5-2-1.5c.1-.4.1-.8.1-1.2Z"/></svg>
+      </span>
+      <span>Settings</span>
+    </button>
+  </nav>
+
+  <!-- =========================================================
+       BUG REPORT MODAL
+  ========================================================== -->
+  <div
+    id="bugReportOverlay"
+    class="modal-overlay"
+    aria-hidden="true"
+    onclick="closeBugReportModal()"
+  >
+    <div
+      class="modal-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="bugReportTitle"
+      onclick="event.stopPropagation()"
+    >
+      <h3 id="bugReportTitle">Report a Bug</h3>
+      <p>Describe the issue clearly. This preview stores the report locally unless you connect a backend.</p>
+
+      <form id="bugReportForm" onsubmit="submitBugReport(event)">
+        <div class="field">
+          <label for="bugReporterName">Your Name</label>
+          <input id="bugReporterName" type="text" maxlength="80" autocomplete="name" required />
+        </div>
+
+        <div class="field">
+          <label for="bugReporterEmail">Contact Email</label>
+          <input id="bugReporterEmail" type="email" maxlength="120" autocomplete="email" required />
+        </div>
+
+        <div class="field">
+          <label for="bugCategory">Bug Category</label>
+          <select id="bugCategory" required>
+            <option value="">Select issue type</option>
+            <option value="login">Login / Student ID</option>
+            <option value="navigation">Navigation</option>
+            <option value="theme">Theme / Reading Mode</option>
+            <option value="notification">Notifications</option>
+            <option value="ui">UI / Design</option>
+            <option value="performance">Slow / Lagging</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="bugDescription">What happened?</label>
+          <textarea id="bugDescription" maxlength="1200" required></textarea>
+        </div>
+
+        <div id="bugReportStatus" class="status-message" aria-live="polite"></div>
+
+        <button type="submit" class="app-btn primary" id="bugReportSubmitBtn">
+          Submit Report
+        </button>
+
+        <button
+          type="button"
+          class="app-btn"
+          style="width:100%; margin-top:10px;"
+          onclick="closeBugReportModal()"
+        >
+          Close
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    /* =========================================================
+       ACADEMEFORGE SINGLE FILE SCRIPT
+       - Section navigation
+       - Browser/mobile back button support
+       - Black/white theme
+       - Font color picker
+       - Local demo request status
+    ========================================================= */
+
+    (function () {
+      "use strict";
+
+      const STORAGE_KEYS = Object.freeze({
+        theme: "af_theme_mode",
+        fontColor: "af_font_color",
+        language: "af_language",
+        studentName: "af_student_name",
+        contactRequests: "af_contact_requests",
+        bugReports: "af_bug_reports"
+      });
+
+      const VALID_SECTIONS = new Set([
+        "home",
+        "settings",
+        "studentaf",
+        "batchaf",
+        "community",
+        "explore",
+        "management",
+        "learningHeatmap",
+        "notifications",
+        "contactUsAf",
+        "requestStatusAf",
+        "languages"
+      ]);
+
+      let currentBannerIndex = 0;
+      let bannerTimer = null;
+      let internalPopLock = false;
+
+      function byId(id) {
+        return document.getElementById(id);
+      }
+
+      function all(selector, root) {
+        return Array.from((root || document).querySelectorAll(selector));
+      }
+
+      function safeText(value) {
+        return String(value == null ? "" : value).trim();
+      }
+
+      function isEmail(value) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(safeText(value));
+      }
+
+      function escapeHtml(value) {
+        return String(value == null ? "" : value).replace(/[&<>"']/g, function (char) {
+          return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+          }[char];
+        });
+      }
+
+      function getActiveSectionId() {
+        const active = document.querySelector(".section.active");
+        return active ? active.id : "home";
+      }
+
+      function setMetaThemeColor() {
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (!meta) return;
+        meta.setAttribute("content", document.body.classList.contains("af-dark") ? "#000000" : "#ffffff");
+      }
+
+      function updateNavActive(sectionId) {
+        all(".bottom-nav [data-section]").forEach(function (item) {
+          const active = item.getAttribute("data-section") === sectionId;
+          item.classList.toggle("active", active);
+          if (active) {
+            item.setAttribute("aria-current", "page");
+          } else {
+            item.removeAttribute("aria-current");
+          }
+        });
+      }
+
+      function showSection(sectionId, options) {
+        const opts = options || {};
+        const id = VALID_SECTIONS.has(sectionId) ? sectionId : "home";
+        const target = byId(id);
+
+        if (!target) return;
+
+        all(".section").forEach(function (section) {
+          section.classList.remove("active");
+          section.setAttribute("aria-hidden", "true");
+        });
+
+        target.classList.add("active");
+        target.setAttribute("aria-hidden", "false");
+
+        updateNavActive(id);
+        hydrateSettingsName();
+
+        if (id === "requestStatusAf") {
+          loadRequestStatus(false);
+        }
+
+        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+
+        if (opts.push !== false) {
+          const state = { section: id };
+          const hash = "#" + id;
+          if (location.hash !== hash) {
+            history.pushState(state, "", hash);
+          } else {
+            history.replaceState(state, "", hash);
+          }
+        }
+      }
+
+      function navigateTo(sectionId) {
+        showSection(sectionId, { push: true });
+      }
+
+      function goBack() {
+        if (history.length > 1) {
+          history.back();
+          return;
+        }
+        showSection("home", { push: true });
+      }
+
+      function handleNavHref(event, sectionId) {
+        event.preventDefault();
+        navigateTo(sectionId);
+      }
+
+      function initHistory() {
+        const initialHash = safeText(location.hash).replace("#", "");
+        const initialSection = VALID_SECTIONS.has(initialHash) ? initialHash : "home";
+
+        history.replaceState({ section: initialSection }, "", "#" + initialSection);
+        showSection(initialSection, { push: false });
+
+        window.addEventListener("popstate", function (event) {
+          if (internalPopLock) return;
+          const stateSection = event.state && event.state.section;
+          const hashSection = safeText(location.hash).replace("#", "");
+          const nextSection = VALID_SECTIONS.has(stateSection)
+            ? stateSection
+            : VALID_SECTIONS.has(hashSection)
+              ? hashSection
+              : "home";
+
+          showSection(nextSection, { push: false });
+        });
+      }
+
+      function hydrateSettingsName() {
+        const nameTargets = [
+          byId("settingsStudentName"),
+          byId("studentDashboardCardNameAf")
+        ];
+
+        const storedName =
+          localStorage.getItem(STORAGE_KEYS.studentName) ||
+          localStorage.getItem("student_name_af") ||
+          localStorage.getItem("studentNameaf") ||
+          "Student";
+
+        nameTargets.forEach(function (node) {
+          if (!node) return;
+          node.textContent = "Hi, " + storedName;
+        });
+      }
+
+      function applyTheme(mode) {
+        const isDark = mode === "dark";
+        document.body.classList.toggle("af-dark", isDark);
+        localStorage.setItem(STORAGE_KEYS.theme, isDark ? "dark" : "light");
+
+        const toggle = byId("settingsDarkToggle");
+        if (toggle) toggle.checked = isDark;
+
+        setMetaThemeColor();
+
+        const savedColor = localStorage.getItem(STORAGE_KEYS.fontColor);
+        if (!savedColor) {
+          document.documentElement.style.setProperty("--af-font-color", isDark ? "#ffffff" : "#000000");
+        }
+      }
+
+      function toggleDarkMode(enabled) {
+        applyTheme(enabled ? "dark" : "light");
+        toast(enabled ? "Night mode enabled." : "Light mode enabled.");
+      }
+
+      function setFontColor(color) {
+        const safeColor = /^#[0-9a-f]{6}$/i.test(color) ? color : "#000000";
+        localStorage.setItem(STORAGE_KEYS.fontColor, safeColor);
+        document.documentElement.style.setProperty("--af-font-color", safeColor);
+
+        all(".color-choice").forEach(function (btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-color") === safeColor);
+        });
+
+        toast("Font colour updated.");
+      }
+
+      function hydrateFontColor() {
+        const fallback = document.body.classList.contains("af-dark") ? "#ffffff" : "#000000";
+        const saved = localStorage.getItem(STORAGE_KEYS.fontColor) || fallback;
+        document.documentElement.style.setProperty("--af-font-color", saved);
+
+        all(".color-choice").forEach(function (btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-color") === saved);
+        });
+      }
+
+      function setLanguage(language) {
+        const allowed = new Set(["en", "hi", "ur", "bn", "ta"]);
+        const lang = allowed.has(language) ? language : "en";
+        localStorage.setItem(STORAGE_KEYS.language, lang);
+
+        all(".language-btn").forEach(function (btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-lang") === lang);
+        });
+
+        toast("Language preference saved.");
+      }
+
+      function hydrateLanguage() {
+        const lang = localStorage.getItem(STORAGE_KEYS.language) || "en";
+        all(".language-btn").forEach(function (btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-lang") === lang);
+        });
+      }
+
+      function toast(message) {
+        const node = byId("toast");
+        if (!node) return;
+
+        node.textContent = safeText(message);
+        node.classList.add("show");
+
+        clearTimeout(window.__afToastTimer);
+        window.__afToastTimer = setTimeout(function () {
+          node.classList.remove("show");
+        }, 2200);
+      }
+
+      function goToBannerSlide(index) {
+        const slides = all(".banner-slide");
+        const dots = all(".banner-dot");
+        if (!slides.length) return;
+
+        const next = Number.isFinite(Number(index)) ? Number(index) : 0;
+        currentBannerIndex = ((next % slides.length) + slides.length) % slides.length;
+
+        slides.forEach(function (slide, slideIndex) {
+          slide.classList.toggle("active", slideIndex === currentBannerIndex);
+        });
+
+        dots.forEach(function (dot, dotIndex) {
+          dot.classList.toggle("active", dotIndex === currentBannerIndex);
+        });
+      }
+
+      function startBannerAutoPlay() {
+        clearInterval(bannerTimer);
+        bannerTimer = setInterval(function () {
+          const slides = all(".banner-slide");
+          if (slides.length <= 1) return;
+          goToBannerSlide(currentBannerIndex + 1);
+        }, 4200);
+      }
+
+      function setupBannerTouch() {
+        const slider = byId("homeBannerSlider");
+        if (!slider) return;
+
+        let startX = 0;
+        let startY = 0;
+        let active = false;
+
+        slider.addEventListener("touchstart", function (event) {
+          const touch = event.touches && event.touches[0];
+          if (!touch) return;
+          active = true;
+          startX = touch.clientX;
+          startY = touch.clientY;
+        }, { passive: true });
+
+        slider.addEventListener("touchend", function (event) {
+          if (!active) return;
+          active = false;
+
+          const touch = event.changedTouches && event.changedTouches[0];
+          if (!touch) return;
+
+          const dx = touch.clientX - startX;
+          const dy = touch.clientY - startY;
+
+          if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+
+          if (dx < 0) {
+            goToBannerSlide(currentBannerIndex + 1);
+          } else {
+            goToBannerSlide(currentBannerIndex - 1);
+          }
+
+          startBannerAutoPlay();
+        }, { passive: true });
+      }
+
+      function openStudentProfile() {
+        navigateTo("studentaf");
+      }
+
+      function openBugReportModal() {
+        const overlay = byId("bugReportOverlay");
+        const form = byId("bugReportForm");
+        const status = byId("bugReportStatus");
+
+        if (form) form.reset();
+        if (status) {
+          status.textContent = "";
+          status.classList.remove("show");
+        }
+
+        if (overlay) {
+          overlay.classList.add("show");
+          overlay.setAttribute("aria-hidden", "false");
+          document.body.style.overflow = "hidden";
+        }
+
+        setTimeout(function () {
+          const firstInput = byId("bugReporterName");
+          if (firstInput) firstInput.focus();
+        }, 80);
+      }
+
+      function closeBugReportModal() {
+        const overlay = byId("bugReportOverlay");
+        if (overlay) {
+          overlay.classList.remove("show");
+          overlay.setAttribute("aria-hidden", "true");
+        }
+        document.body.style.overflow = "";
+      }
+
+      function setStatus(nodeId, message) {
+        const node = byId(nodeId);
+        if (!node) return;
+        node.textContent = safeText(message);
+        node.classList.add("show");
+      }
+
+      function readJsonArray(key) {
+        try {
+          const parsed = JSON.parse(localStorage.getItem(key) || "[]");
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (error) {
+          return [];
+        }
+      }
+
+      function writeJsonArray(key, value) {
+        localStorage.setItem(key, JSON.stringify(Array.isArray(value) ? value : []));
+      }
+
+      function submitContactRequest(event) {
+        event.preventDefault();
+
+        const name = safeText(byId("contactNameAf") && byId("contactNameAf").value);
+        const mobile = safeText(byId("contactMobileAf") && byId("contactMobileAf").value);
+        const email = safeText(byId("contactEmailAf") && byId("contactEmailAf").value);
+        const reason = safeText(byId("contactReasonAf") && byId("contactReasonAf").value);
+        const problem = safeText(byId("contactProblemAf") && byId("contactProblemAf").value);
+
+        if (name.length < 2) {
+          setStatus("contactUsMessageAf", "Please enter a valid full name.");
+          return;
+        }
+
+        if (mobile.length < 8) {
+          setStatus("contactUsMessageAf", "Please enter a valid mobile number.");
+          return;
+        }
+
+        if (!isEmail(email)) {
+          setStatus("contactUsMessageAf", "Please enter a valid email address.");
+          return;
+        }
+
+        if (!reason) {
+          setStatus("contactUsMessageAf", "Please select a contact reason.");
+          return;
+        }
+
+        if (problem.length < 10) {
+          setStatus("contactUsMessageAf", "Please describe your problem in at least 10 characters.");
+          return;
+        }
+
+        const requests = readJsonArray(STORAGE_KEYS.contactRequests);
+        requests.unshift({
+          id: "CONTACT-" + Date.now(),
+          type: "Contact Request",
+          name: name,
+          mobile: mobile,
+          email: email,
+          reason: reason,
+          problem: problem,
+          status: "Pending",
+          createdAt: new Date().toISOString()
+        });
+
+        writeJsonArray(STORAGE_KEYS.contactRequests, requests);
+
+        const form = byId("contactUsFormAf");
+        if (form) form.reset();
+
+        setStatus("contactUsMessageAf", "Your contact request has been saved in this preview.");
+        toast("Contact request submitted.");
+      }
+
+      function submitBugReport(event) {
+        event.preventDefault();
+
+        const name = safeText(byId("bugReporterName") && byId("bugReporterName").value);
+        const email = safeText(byId("bugReporterEmail") && byId("bugReporterEmail").value);
+        const category = safeText(byId("bugCategory") && byId("bugCategory").value);
+        const description = safeText(byId("bugDescription") && byId("bugDescription").value);
+
+        if (name.length < 2) {
+          setStatus("bugReportStatus", "Please enter a valid name.");
+          return;
+        }
+
+        if (!isEmail(email)) {
+          setStatus("bugReportStatus", "Please enter a valid email address.");
+          return;
+        }
+
+        if (!category) {
+          setStatus("bugReportStatus", "Please select a bug category.");
+          return;
+        }
+
+        if (description.length < 10) {
+          setStatus("bugReportStatus", "Please describe the bug in at least 10 characters.");
+          return;
+        }
+
+        const reports = readJsonArray(STORAGE_KEYS.bugReports);
+        reports.unshift({
+          id: "BUG-" + Date.now(),
+          type: "Bug Report",
+          name: name,
+          email: email,
+          category: category,
+          description: description,
+          status: "Pending",
+          page: location.href,
+          userAgent: navigator.userAgent || "",
+          createdAt: new Date().toISOString()
+        });
+
+        writeJsonArray(STORAGE_KEYS.bugReports, reports);
+
+        setStatus("bugReportStatus", "Bug report saved in this preview.");
+        toast("Bug report submitted.");
+
+        setTimeout(function () {
+          closeBugReportModal();
+        }, 800);
+      }
+
+      function formatDate(value) {
+        try {
+          return new Date(value).toLocaleString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit"
+          });
+        } catch (error) {
+          return "Recently";
+        }
+      }
+
+      function loadRequestStatus(showToast) {
+        const list = byId("requestStatusListAf");
+        const message = byId("requestStatusMessageAf");
+        if (!list) return;
+
+        const contactRequests = readJsonArray(STORAGE_KEYS.contactRequests);
+        const bugReports = readJsonArray(STORAGE_KEYS.bugReports);
+        const items = contactRequests.concat(bugReports).sort(function (a, b) {
+          return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
+        });
+
+        if (!items.length) {
+          list.innerHTML = "";
+          if (message) {
+            message.classList.add("show");
+            message.textContent = "No requests found in this preview. Submit a contact request or bug report first.";
+          }
+          if (showToast) toast("No requests found.");
+          return;
+        }
+
+        if (message) {
+          message.classList.add("show");
+          message.textContent = "Showing locally saved preview requests.";
+        }
+
+        list.innerHTML = items.map(function (item) {
+          const title = item.type || "Request";
+          const detail = item.reason || item.category || "General";
+          const status = item.status || "Pending";
+          const createdAt = formatDate(item.createdAt);
+
+          return [
+            '<article class="request-card">',
+            '<h3>' + escapeHtml(title) + " · " + escapeHtml(status) + '</h3>',
+            '<p><strong>ID:</strong> ' + escapeHtml(item.id || "-") + '</p>',
+            '<p><strong>Type:</strong> ' + escapeHtml(detail) + '</p>',
+            '<p><strong>Date:</strong> ' + escapeHtml(createdAt) + '</p>',
+            '</article>'
+          ].join("");
+        }).join("");
+
+        if (showToast) toast("Request status refreshed.");
+      }
+
+      function logoutStudent() {
+        localStorage.removeItem(STORAGE_KEYS.studentName);
+        localStorage.removeItem("student_name_af");
+        localStorage.removeItem("studentNameaf");
+        hydrateSettingsName();
+        toast("Logged out locally.");
+      }
+
+      function initTheme() {
+        const saved = localStorage.getItem(STORAGE_KEYS.theme);
+        const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        applyTheme(saved || (prefersDark ? "dark" : "light"));
+        hydrateFontColor();
+      }
+
+      function initKeyboardShortcuts() {
+        document.addEventListener("keydown", function (event) {
+          if (event.key === "Escape") {
+            closeBugReportModal();
+          }
+        });
+      }
+
+      function init() {
+        initTheme();
+        hydrateLanguage();
+        hydrateSettingsName();
+        setupBannerTouch();
+        startBannerAutoPlay();
+        initHistory();
+        initKeyboardShortcuts();
+      }
+
+      window.navigateTo = navigateTo;
+      window.showSection = navigateTo;
+      window.goBack = goBack;
+      window.handleNavHref = handleNavHref;
+      window.toggleDarkMode = toggleDarkMode;
+      window.setFontColor = setFontColor;
+      window.setLanguage = setLanguage;
+      window.goToBannerSlide = goToBannerSlide;
+      window.openStudentProfile = openStudentProfile;
+      window.openBugReportModal = openBugReportModal;
+      window.closeBugReportModal = closeBugReportModal;
+      window.submitContactRequest = submitContactRequest;
+      window.submitBugReport = submitBugReport;
+      window.loadRequestStatus = loadRequestStatus;
+      window.logoutStudent = logoutStudent;
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+</body>
+</html>
