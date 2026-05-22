@@ -7,36 +7,47 @@
     content="width=device-width, initial-scale=1, viewport-fit=cover"
   />
   <meta name="theme-color" content="#ffffff" />
-  <title>AcademeForge Mobile App</title>
+  <title>AcademeForge Mobile Preview</title>
 
   <style>
     /* =========================================================
        ACADEMEFORGE SINGLE FILE MOBILE APP
-       Extracted:
-       - Settings page + nav buttons logic from settings code
-       - Home visuals + home buttons from home code
-       Default: Black & White, lightweight, no external fonts
+       PART 1/3: CSS
+       - No external fonts
+       - Mobile layout even on desktop/laptop
+       - Clean compact settings rows
+       - href="#" friendly UI
+       - Real app colour accent system
+       - Browser/mobile back button ready
     ========================================================= */
 
     :root {
-      --af-bg: #f7f7f7;
+      --af-bg: #f4f4f4;
       --af-surface: #ffffff;
       --af-surface-2: #f1f1f1;
       --af-text: #000000;
       --af-muted: #555555;
-      --af-border: #d9d9d9;
+      --af-border: #dddddd;
       --af-soft-border: #eeeeee;
+
       --af-primary: #000000;
       --af-primary-text: #ffffff;
-      --af-danger: #000000;
-      --af-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
+
+      --af-app-color: #000000;
+      --af-app-color-rgb: 0, 0, 0;
+      --af-app-color-soft: rgba(0, 0, 0, 0.08);
+      --af-app-color-mid: rgba(0, 0, 0, 0.16);
+      --af-app-color-strong: rgba(0, 0, 0, 0.30);
+
+      --af-shadow: 0 12px 28px rgba(0, 0, 0, 0.10);
       --af-shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.06);
+
       --af-radius-xl: 24px;
-      --af-radius-lg: 18px;
+      --af-radius-lg: 20px;
       --af-radius-md: 14px;
+
       --af-nav-height: 82px;
       --af-safe-bottom: env(safe-area-inset-bottom, 0px);
-      --af-font-color: #000000;
     }
 
     body.af-dark {
@@ -44,15 +55,21 @@
       --af-surface: #0d0d0d;
       --af-surface-2: #171717;
       --af-text: #ffffff;
-      --af-muted: #b5b5b5;
-      --af-border: #2a2a2a;
-      --af-soft-border: #1f1f1f;
+      --af-muted: #b8b8b8;
+      --af-border: #2b2b2b;
+      --af-soft-border: #202020;
+
       --af-primary: #ffffff;
       --af-primary-text: #000000;
-      --af-danger: #ffffff;
-      --af-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+
+      --af-app-color: #ffffff;
+      --af-app-color-rgb: 255, 255, 255;
+      --af-app-color-soft: rgba(255, 255, 255, 0.10);
+      --af-app-color-mid: rgba(255, 255, 255, 0.18);
+      --af-app-color-strong: rgba(255, 255, 255, 0.32);
+
+      --af-shadow: 0 14px 32px rgba(0, 0, 0, 0.48);
       --af-shadow-soft: 0 8px 22px rgba(0, 0, 0, 0.36);
-      --af-font-color: #ffffff;
     }
 
     * {
@@ -63,6 +80,8 @@
     html {
       width: 100%;
       min-height: 100%;
+      margin: 0;
+      padding: 0;
       background: var(--af-bg);
       color: var(--af-text);
       overflow-x: hidden;
@@ -73,8 +92,9 @@
       width: 100%;
       min-height: 100dvh;
       margin: 0;
+      padding: 0;
       background: var(--af-bg);
-      color: var(--af-font-color);
+      color: var(--af-text);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
       text-rendering: optimizeSpeed;
       -webkit-font-smoothing: antialiased;
@@ -91,27 +111,41 @@
 
     button {
       border: 0;
+      outline: 0;
       cursor: pointer;
-      color: inherit;
       background: transparent;
+      color: inherit;
     }
 
     a {
       color: inherit;
       text-decoration: none;
+      cursor: pointer;
     }
 
     img {
       display: block;
       max-width: 100%;
+      user-select: none;
+      -webkit-user-drag: none;
     }
+
+    input,
+    select,
+    textarea {
+      outline: 0;
+    }
+
+    /* =========================================================
+       APP SHELL
+    ========================================================= */
 
     .app-shell {
       width: 100%;
       max-width: 480px;
       min-height: 100dvh;
       margin: 0 auto;
-      padding: 12px 12px calc(var(--af-nav-height) + var(--af-safe-bottom) + 24px);
+      padding: 12px 12px calc(var(--af-nav-height) + var(--af-safe-bottom) + 22px);
       background: var(--af-bg);
       position: relative;
       overflow-x: hidden;
@@ -121,6 +155,9 @@
       body {
         display: flex;
         justify-content: center;
+        background:
+          linear-gradient(90deg, #eeeeee 0, #eeeeee 1px, transparent 1px),
+          var(--af-bg);
       }
 
       .app-shell {
@@ -143,26 +180,23 @@
     @keyframes afPageIn {
       from {
         opacity: 0;
-        transform: translateY(6px);
+        transform: translateY(5px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
 
-    .glass,
-    .card,
-    .panel {
-      background: var(--af-surface);
-      border: 1px solid var(--af-border);
-      box-shadow: var(--af-shadow-soft);
-    }
+    /* =========================================================
+       TOP BAR
+    ========================================================= */
 
     .topbar {
       position: sticky;
       top: 0;
-      z-index: 50;
+      z-index: 80;
       padding: 6px 0 10px;
       background: color-mix(in srgb, var(--af-bg) 88%, transparent);
       backdrop-filter: blur(14px);
@@ -214,7 +248,7 @@
       color: var(--af-muted);
       font-size: 10px;
       line-height: 1.15;
-      font-weight: 700;
+      font-weight: 800;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -228,18 +262,28 @@
       place-items: center;
       background: var(--af-surface);
       border: 1px solid var(--af-border);
-      color: var(--af-text);
+      color: var(--af-app-color);
       box-shadow: var(--af-shadow-soft);
       font-size: 16px;
       font-weight: 900;
+      transition:
+        transform 0.14s ease,
+        background 0.14s ease,
+        border-color 0.14s ease,
+        color 0.14s ease;
     }
 
     .top-icon-btn:active,
     .app-btn:active,
+    .mini-btn:active,
+    .back-btn:active,
     .action-card:active,
     .settings-row:active,
+    .settings-link-row:active,
+    .language-link:active,
     .nav-btn:active,
-    .nav-link:active {
+    .nav-link:active,
+    .color-choice:active {
       transform: scale(0.975);
     }
 
@@ -257,6 +301,8 @@
       overflow: hidden;
       margin: 8px 0 12px;
       background: var(--af-surface);
+      border: 1px solid var(--af-border);
+      box-shadow: var(--af-shadow-soft);
       touch-action: pan-y;
       user-select: none;
       -webkit-user-select: none;
@@ -267,7 +313,9 @@
       inset: 0;
       opacity: 0;
       transform: translateX(100%);
-      transition: opacity 0.28s ease, transform 0.36s ease;
+      transition:
+        opacity 0.28s ease,
+        transform 0.36s ease;
       pointer-events: none;
       z-index: 1;
     }
@@ -282,8 +330,6 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      pointer-events: none;
-      -webkit-user-drag: none;
       background: var(--af-surface-2);
     }
 
@@ -298,7 +344,7 @@
       gap: 6px;
       padding: 6px 8px;
       border-radius: 999px;
-      background: color-mix(in srgb, var(--af-surface) 82%, transparent);
+      background: color-mix(in srgb, var(--af-surface) 84%, transparent);
       border: 1px solid var(--af-border);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
@@ -311,13 +357,16 @@
       padding: 0;
       background: var(--af-muted);
       opacity: 0.45;
-      transition: all 0.18s ease;
+      transition:
+        width 0.18s ease,
+        opacity 0.18s ease,
+        background 0.18s ease;
     }
 
     .banner-dot.active {
       width: 20px;
       opacity: 1;
-      background: var(--af-text);
+      background: var(--af-app-color);
     }
 
     .moving-text-banner {
@@ -346,10 +395,10 @@
     .moving-text-track span {
       display: inline-block;
       flex: 0 0 auto;
+      color: var(--af-muted);
       font-size: 11px;
       line-height: 1;
       font-weight: 800;
-      color: var(--af-muted);
       white-space: nowrap;
     }
 
@@ -357,6 +406,7 @@
       0% {
         transform: translate3d(0, 0, 0);
       }
+
       100% {
         transform: translate3d(-50%, 0, 0);
       }
@@ -388,10 +438,19 @@
       text-align: left;
       color: var(--af-text);
       overflow: hidden;
-      transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
       background: var(--af-surface);
       border: 1px solid var(--af-border);
       box-shadow: var(--af-shadow-soft);
+      transition:
+        transform 0.14s ease,
+        border-color 0.14s ease,
+        box-shadow 0.14s ease,
+        background 0.14s ease;
+    }
+
+    .action-card:hover {
+      background: var(--af-app-color-soft);
+      border-color: var(--af-app-color-strong);
     }
 
     .action-card.wide {
@@ -407,27 +466,28 @@
       display: grid;
       place-items: center;
       background: var(--af-surface-2);
-      color: var(--af-text);
+      color: var(--af-app-color);
       font-size: 18px;
       line-height: 1;
+      font-weight: 900;
       border: 1px solid var(--af-soft-border);
     }
 
     .action-card h3 {
       margin: 2px 0 5px;
+      color: var(--af-text);
       font-size: 14px;
       line-height: 1.15;
       font-weight: 900;
       letter-spacing: -0.02em;
-      color: var(--af-text);
     }
 
     .action-card p {
       margin: 0;
+      color: var(--af-muted);
       font-size: 10.5px;
       line-height: 1.35;
-      font-weight: 700;
-      color: var(--af-muted);
+      font-weight: 800;
     }
 
     .developer-credit-line {
@@ -442,19 +502,19 @@
 
     .developer-credit-line span {
       display: block;
+      color: var(--af-text);
       font-size: 12px;
       line-height: 1.25;
       font-weight: 900;
-      color: var(--af-text);
     }
 
     .developer-credit-line small {
       display: block;
       margin-top: 5px;
+      color: var(--af-muted);
       font-size: 11px;
       line-height: 1.35;
-      font-weight: 700;
-      color: var(--af-muted);
+      font-weight: 800;
     }
 
     /* =========================================================
@@ -462,9 +522,9 @@
     ========================================================= */
 
     .page-head {
-      display: flex;
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) auto;
       align-items: center;
-      justify-content: space-between;
       gap: 10px;
       margin: 4px 0 12px;
       padding: 14px;
@@ -474,20 +534,25 @@
       box-shadow: var(--af-shadow-soft);
     }
 
+    .page-head.no-extra {
+      grid-template-columns: 44px minmax(0, 1fr);
+    }
+
     .page-head h2 {
       margin: 0;
+      color: var(--af-text);
       font-size: 22px;
       line-height: 1.1;
+      font-weight: 900;
       letter-spacing: -0.04em;
-      color: var(--af-text);
     }
 
     .page-head p {
       margin: 4px 0 0;
+      color: var(--af-muted);
       font-size: 12px;
       line-height: 1.35;
-      font-weight: 700;
-      color: var(--af-muted);
+      font-weight: 800;
     }
 
     .back-btn,
@@ -502,24 +567,29 @@
       padding: 10px 13px;
       background: var(--af-surface-2);
       border: 1px solid var(--af-border);
-      color: var(--af-text);
+      color: var(--af-app-color);
       font-weight: 900;
       line-height: 1;
-      transition: transform 0.14s ease;
+      transition:
+        transform 0.14s ease,
+        background 0.14s ease,
+        border-color 0.14s ease,
+        color 0.14s ease;
     }
 
     .back-btn {
+      width: 42px;
       min-width: 42px;
-      padding: 10px 12px;
-      white-space: nowrap;
+      padding: 0;
+      font-size: 18px;
     }
 
     .app-btn.primary {
       width: 100%;
       min-height: 48px;
-      background: var(--af-primary);
+      background: var(--af-app-color);
       color: var(--af-primary-text);
-      border-color: var(--af-primary);
+      border-color: var(--af-app-color);
     }
 
     .placeholder-card {
@@ -532,8 +602,10 @@
 
     .placeholder-card h3 {
       margin: 0 0 8px;
-      font-size: 18px;
       color: var(--af-text);
+      font-size: 18px;
+      line-height: 1.2;
+      font-weight: 900;
     }
 
     .placeholder-card p {
@@ -541,12 +613,16 @@
       color: var(--af-muted);
       font-size: 13px;
       line-height: 1.45;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     /* =========================================================
        SETTINGS PAGE
     ========================================================= */
+
+    .settings-section {
+      padding-bottom: 0;
+    }
 
     .settings-profile-card {
       display: flex;
@@ -569,12 +645,14 @@
       border-radius: 16px;
       background: var(--af-surface-2);
       border: 1px solid var(--af-soft-border);
-      color: var(--af-text);
+      color: var(--af-app-color);
       font-size: 25px;
+      font-weight: 900;
     }
 
     .settings-profile-info {
       min-width: 0;
+      flex: 1 1 auto;
     }
 
     .settings-profile-info h2 {
@@ -590,10 +668,14 @@
     }
 
     .settings-profile-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
       padding: 0;
-      color: var(--af-muted);
+      color: var(--af-app-color);
       font-size: 13px;
-      font-weight: 800;
+      line-height: 1;
+      font-weight: 900;
       text-align: left;
     }
 
@@ -602,19 +684,20 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      min-height: 54px;
       padding: 15px 16px;
       margin-bottom: 12px;
       border-radius: 20px;
-      background: var(--af-primary);
+      background: var(--af-app-color);
       color: var(--af-primary-text);
-      border: 1px solid var(--af-primary);
+      border: 1px solid var(--af-app-color);
       box-shadow: var(--af-shadow-soft);
       font-weight: 900;
     }
 
     .settings-list,
     .settings-support-list,
-    .settings-color-panel {
+    .settings-color-wrap {
       overflow: hidden;
       margin-bottom: 12px;
       border-radius: 22px;
@@ -623,55 +706,74 @@
       box-shadow: var(--af-shadow-soft);
     }
 
-    .settings-row {
+    .settings-row,
+    .settings-link-row {
       width: 100%;
       min-height: 62px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 14px 16px;
+      padding: 13px 16px;
       background: var(--af-surface);
       color: var(--af-text);
+      border: 0;
       border-bottom: 1px solid var(--af-soft-border);
       text-align: left;
-      transition: transform 0.14s ease, background 0.14s ease;
+      text-decoration: none;
+      cursor: pointer;
+      transition:
+        transform 0.14s ease,
+        background 0.14s ease,
+        border-color 0.14s ease;
     }
 
-    .settings-row:last-child {
+    .settings-row:last-child,
+    .settings-link-row:last-child {
       border-bottom: 0;
     }
 
+    .settings-row:hover,
+    .settings-link-row:hover {
+      background: var(--af-app-color-soft);
+    }
+
     .settings-row-left {
+      min-width: 0;
+      flex: 1 1 auto;
       display: flex;
       align-items: center;
       gap: 12px;
-      min-width: 0;
-      font-weight: 900;
     }
 
     .settings-row-icon {
-      display: grid;
-      place-items: center;
       width: 34px;
       height: 34px;
       min-width: 34px;
+      display: grid;
+      place-items: center;
       border-radius: 12px;
       background: var(--af-surface-2);
       border: 1px solid var(--af-soft-border);
-      color: var(--af-text);
-      font-size: 15px;
+      color: var(--af-app-color);
+      font-size: 14px;
+      line-height: 1;
+      font-weight: 900;
     }
 
     .settings-row-title {
       min-width: 0;
+      flex: 1 1 auto;
     }
 
     .settings-row-title strong {
       display: block;
-      font-size: 14px;
-      line-height: 1.2;
+      margin: 0 0 3px;
       color: var(--af-text);
+      font-size: 14px;
+      line-height: 1.18;
+      font-weight: 900;
+      letter-spacing: -0.02em;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -679,28 +781,31 @@
 
     .settings-row-title small {
       display: block;
-      margin-top: 3px;
       color: var(--af-muted);
       font-size: 11px;
       line-height: 1.25;
-      font-weight: 700;
+      font-weight: 800;
+      white-space: normal;
+      overflow: visible;
+      text-overflow: unset;
     }
 
     .settings-arrow {
+      flex: 0 0 auto;
+      color: var(--af-app-color);
       font-size: 24px;
-      color: var(--af-muted);
       line-height: 1;
-      min-width: 14px;
-      text-align: right;
+      font-weight: 900;
     }
 
     .settings-badge {
-      padding: 5px 9px;
+      flex: 0 0 auto;
+      padding: 6px 10px;
       border-radius: 999px;
-      background: var(--af-surface-2);
-      color: var(--af-muted);
-      border: 1px solid var(--af-soft-border);
-      font-size: 11px;
+      background: var(--af-app-color-soft);
+      color: var(--af-app-color);
+      border: 1px solid var(--af-app-color-mid);
+      font-size: 10px;
       line-height: 1;
       font-weight: 900;
       white-space: nowrap;
@@ -725,7 +830,9 @@
       border-radius: 999px;
       background: var(--af-surface-2);
       border: 1px solid var(--af-border);
-      transition: 0.16s ease;
+      transition:
+        background 0.16s ease,
+        border-color 0.16s ease;
     }
 
     .settings-slider::before {
@@ -737,12 +844,14 @@
       top: 2px;
       border-radius: 50%;
       background: var(--af-muted);
-      transition: 0.16s ease;
+      transition:
+        transform 0.16s ease,
+        background 0.16s ease;
     }
 
     .settings-switch input:checked + .settings-slider {
-      background: var(--af-primary);
-      border-color: var(--af-primary);
+      background: var(--af-app-color);
+      border-color: var(--af-app-color);
     }
 
     .settings-switch input:checked + .settings-slider::before {
@@ -750,72 +859,142 @@
       background: var(--af-primary-text);
     }
 
+    /* =========================================================
+       APP COLOUR PANEL
+    ========================================================= */
+
+    .settings-color-wrap {
+      margin-bottom: 12px;
+    }
+
+    .settings-color-toggle {
+      border-bottom: 0;
+    }
+
+    .settings-color-toggle .settings-row-title small {
+      max-width: 260px;
+    }
+
     .settings-color-panel {
+      margin: 0;
       padding: 14px;
+      border: 0;
+      border-top: 1px solid var(--af-soft-border);
+      border-radius: 0;
+      background: var(--af-surface);
+      box-shadow: none;
+      overflow: hidden;
+      transition:
+        max-height 0.22s ease,
+        opacity 0.18s ease,
+        padding 0.18s ease,
+        border-width 0.18s ease;
+    }
+
+    .settings-color-panel.collapsed {
+      max-height: 0;
+      opacity: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      border-top-width: 0;
+      pointer-events: none;
+    }
+
+    .settings-color-panel:not(.collapsed) {
+      max-height: 430px;
+      opacity: 1;
+      pointer-events: auto;
     }
 
     .settings-color-panel h3 {
       margin: 0 0 4px;
-      font-size: 15px;
       color: var(--af-text);
+      font-size: 15px;
+      line-height: 1.2;
+      font-weight: 900;
     }
 
     .settings-color-panel p {
       margin: 0 0 12px;
-      font-size: 12px;
       color: var(--af-muted);
-      font-weight: 700;
+      font-size: 11px;
       line-height: 1.35;
+      font-weight: 800;
+    }
+
+    #fontColorPanelArrow {
+      transition: transform 0.18s ease;
+    }
+
+    #fontColorPanelArrow.open {
+      transform: rotate(90deg);
     }
 
     .color-grid {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
     }
 
     .color-choice {
       min-height: 42px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 9px;
+      padding: 10px 12px;
       border-radius: 14px;
       border: 1px solid var(--af-border);
       background: var(--af-surface-2);
       color: var(--af-text);
       font-size: 11px;
+      line-height: 1;
       font-weight: 900;
+      text-align: left;
+      transition:
+        transform 0.14s ease,
+        background 0.14s ease,
+        border-color 0.14s ease,
+        color 0.14s ease,
+        box-shadow 0.14s ease;
+    }
+
+    .color-choice::before {
+      content: "";
+      width: 14px;
+      height: 14px;
+      min-width: 14px;
+      border-radius: 999px;
+      border: 1px solid var(--af-border);
+      background: currentColor;
+    }
+
+    .color-choice[data-color="#ffffff"]::before { background: #ffffff; }
+    .color-choice[data-color="#000000"]::before { background: #000000; }
+    .color-choice[data-color="#ef4444"]::before { background: #ef4444; }
+    .color-choice[data-color="#f97316"]::before { background: #f97316; }
+    .color-choice[data-color="#eab308"]::before { background: #eab308; }
+    .color-choice[data-color="#22c55e"]::before { background: #22c55e; }
+    .color-choice[data-color="#06b6d4"]::before { background: #06b6d4; }
+    .color-choice[data-color="#3b82f6"]::before { background: #3b82f6; }
+    .color-choice[data-color="#8b5cf6"]::before { background: #8b5cf6; }
+    .color-choice[data-color="#ec4899"]::before { background: #ec4899; }
+
+    .color-choice:hover {
+      background: var(--af-app-color-soft);
+      border-color: var(--af-app-color-mid);
     }
 
     .color-choice.active {
-      outline: 2px solid var(--af-text);
-      outline-offset: 2px;
-    }
-
-    .settings-app-version-box {
-      padding: 15px 16px;
-      text-align: center;
-      border-radius: 20px;
-      background: var(--af-surface);
-      border: 1px solid var(--af-border);
-      box-shadow: var(--af-shadow-soft);
-    }
-
-    .settings-app-version-box strong {
-      display: block;
-      color: var(--af-text);
-      font-size: 13px;
-      line-height: 1.25;
-    }
-
-    .settings-app-version-box span {
-      display: block;
-      margin-top: 5px;
-      color: var(--af-muted);
-      font-size: 12px;
-      line-height: 1.35;
-      font-weight: 700;
+      border-color: var(--af-app-color);
+      background: var(--af-app-color-soft);
+      color: var(--af-app-color);
+      box-shadow: 0 0 0 1px var(--af-app-color-strong);
     }
 
     /* =========================================================
-       CONTACT / STATUS / LANGUAGE PAGES
+       LANGUAGE / CONTACT / STATUS PAGES
     ========================================================= */
 
     .form-card {
@@ -835,6 +1014,7 @@
     .field label {
       color: var(--af-muted);
       font-size: 13px;
+      line-height: 1.2;
       font-weight: 900;
     }
 
@@ -847,8 +1027,7 @@
       background: var(--af-surface-2);
       color: var(--af-text);
       padding: 12px;
-      outline: 0;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .field textarea {
@@ -865,8 +1044,8 @@
       color: var(--af-muted);
       border: 1px solid var(--af-soft-border);
       font-size: 13px;
-      font-weight: 800;
       line-height: 1.4;
+      font-weight: 800;
     }
 
     .status-message.show {
@@ -886,14 +1065,16 @@
       margin: 0 0 5px;
       color: var(--af-text);
       font-size: 15px;
+      line-height: 1.2;
+      font-weight: 900;
     }
 
     .request-card p {
-      margin: 0;
+      margin: 0 0 3px;
       color: var(--af-muted);
       font-size: 12px;
       line-height: 1.4;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .language-grid {
@@ -901,7 +1082,7 @@
       gap: 10px;
     }
 
-    .language-btn {
+    .language-link {
       width: 100%;
       min-height: 54px;
       padding: 13px 14px;
@@ -915,12 +1096,17 @@
       justify-content: space-between;
       gap: 12px;
       font-weight: 900;
+      transition:
+        transform 0.14s ease,
+        background 0.14s ease,
+        border-color 0.14s ease,
+        color 0.14s ease;
     }
 
-    .language-btn.active {
-      background: var(--af-primary);
+    .language-link.active {
+      background: var(--af-app-color);
       color: var(--af-primary-text);
-      border-color: var(--af-primary);
+      border-color: var(--af-app-color);
     }
 
     /* =========================================================
@@ -946,6 +1132,8 @@
 
     .modal-card {
       width: min(100%, 430px);
+      max-height: calc(100dvh - 36px);
+      overflow-y: auto;
       padding: 18px;
       border-radius: 22px;
       background: var(--af-surface);
@@ -956,7 +1144,10 @@
 
     .modal-card h3 {
       margin: 0 0 6px;
+      color: var(--af-text);
       font-size: 20px;
+      line-height: 1.2;
+      font-weight: 900;
       letter-spacing: -0.03em;
     }
 
@@ -965,7 +1156,7 @@
       color: var(--af-muted);
       font-size: 13px;
       line-height: 1.45;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .toast {
@@ -983,6 +1174,7 @@
       box-shadow: var(--af-shadow);
       color: var(--af-text);
       font-size: 13px;
+      line-height: 1.3;
       font-weight: 900;
       text-align: center;
     }
@@ -997,6 +1189,7 @@
         opacity: 0;
         transform: translate(-50%, 8px);
       }
+
       to {
         opacity: 1;
         transform: translate(-50%, 0);
@@ -1005,8 +1198,8 @@
 
     /* =========================================================
        BOTTOM NAV
-       Home + Settings = button navigation.
-       Student/Batches/Community = href="#" style anchors.
+       Home + Settings are buttons.
+       Student/Batches/Community are href="#" anchors.
     ========================================================= */
 
     .bottom-nav {
@@ -1020,7 +1213,7 @@
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
       align-items: center;
-      gap: 0;
+      gap: 4px;
       padding: 6px;
       border-radius: 26px;
       overflow: hidden;
@@ -1049,10 +1242,15 @@
       border: 1px solid transparent;
       font-size: 11px;
       line-height: 1;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: -0.01em;
       white-space: nowrap;
-      transition: transform 0.14s ease, background 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+      transition:
+        transform 0.14s ease,
+        background 0.14s ease,
+        color 0.14s ease,
+        border-color 0.14s ease,
+        box-shadow 0.14s ease;
     }
 
     .nav-icon {
@@ -1076,15 +1274,48 @@
 
     .nav-btn.active,
     .nav-link.active {
-      background: var(--af-surface);
-      color: var(--af-text);
-      border-color: var(--af-border);
-      box-shadow: var(--af-shadow-soft);
+      background: var(--af-app-color-soft);
+      color: var(--af-app-color);
+      border-color: var(--af-app-color-mid);
+      box-shadow: 0 0 0 1px var(--af-app-color-strong);
     }
 
-    body.af-dark .nav-btn.active,
-    body.af-dark .nav-link.active {
-      background: var(--af-surface-2);
+    /* =========================================================
+       RESPONSIVE FIXES
+    ========================================================= */
+
+    @media (max-width: 420px) {
+      .app-shell {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
+      .settings-row,
+      .settings-link-row {
+        min-height: 60px;
+        padding: 12px 14px;
+        gap: 10px;
+      }
+
+      .settings-row-icon {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        border-radius: 11px;
+        font-size: 13px;
+      }
+
+      .settings-row-title strong {
+        font-size: 13.5px;
+      }
+
+      .settings-row-title small {
+        font-size: 10.5px;
+      }
+
+      .settings-color-toggle .settings-row-title small {
+        max-width: 190px;
+      }
     }
 
     @media (max-width: 380px) {
@@ -1153,7 +1384,7 @@
       }
 
       .color-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
@@ -1167,341 +1398,111 @@
         scroll-behavior: auto !important;
       }
     }
-    /* =========================================================
-   APP COLOUR FIX
-   Makes selected colour apply globally, not only body text.
-   Also makes colour options wrapped/collapsible like other settings.
-========================================================= */
-
-:root {
-  --af-app-color: var(--af-text);
-  --af-app-color-soft: color-mix(in srgb, var(--af-app-color) 12%, transparent);
-  --af-app-color-border: color-mix(in srgb, var(--af-app-color) 32%, var(--af-border));
-}
-
-body {
-  color: var(--af-app-color);
-}
-
-/* Force app text groups to follow selected colour */
-.brand-copy h1,
-.page-head h2,
-.placeholder-card h3,
-.settings-profile-info h2,
-.settings-row-title strong,
-.settings-color-panel h3,
-.settings-app-version-box strong,
-.action-card h3,
-.developer-credit-line span,
-.request-card h3,
-.language-btn,
-.nav-btn.active,
-.nav-link.active,
-.top-icon-btn,
-.back-btn,
-.app-btn,
-.mini-btn {
-  color: var(--af-app-color) !important;
-}
-
-/* Secondary text stays readable but follows selected colour softly */
-.brand-copy p,
-.page-head p,
-.placeholder-card p,
-.settings-row-title small,
-.settings-color-panel p,
-.settings-app-version-box span,
-.action-card p,
-.developer-credit-line small,
-.request-card p,
-.moving-text-track span,
-.field label,
-.status-message {
-  color: color-mix(in srgb, var(--af-app-color) 72%, var(--af-muted)) !important;
-}
-
-/* Icons, active states, outlines and selected controls */
-.settings-row-icon,
-.action-card .icon,
-.settings-avatar,
-.nav-icon,
-.settings-arrow,
-.settings-badge {
-  color: var(--af-app-color) !important;
-}
-
-.nav-btn.active,
-.nav-link.active,
-.color-choice.active {
-  border-color: var(--af-app-color-border) !important;
-  box-shadow:
-    0 0 0 1px var(--af-app-color-border),
-    var(--af-shadow-soft) !important;
-}
-
-.settings-beta-card,
-.app-btn.primary {
-  background: var(--af-app-color) !important;
-  border-color: var(--af-app-color) !important;
-  color: var(--af-primary-text) !important;
-}
-
-/* Keep black/white buttons readable when app colour is white/black */
-body.af-dark .settings-beta-card,
-body.af-dark .app-btn.primary {
-  color: #000000 !important;
-}
-
-body:not(.af-dark) .settings-beta-card,
-body:not(.af-dark) .app-btn.primary {
-  color: #ffffff !important;
-}
-
-body:not(.af-dark)[data-app-color="#ffffff"] .settings-beta-card,
-body:not(.af-dark)[data-app-color="#ffffff"] .app-btn.primary {
-  color: #000000 !important;
-}
-
-body.af-dark[data-app-color="#000000"] .settings-beta-card,
-body.af-dark[data-app-color="#000000"] .app-btn.primary {
-  color: #ffffff !important;
-}
-
-/* Collapsible app colour panel */
-.settings-color-panel {
-  margin-top: -12px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  transition:
-    max-height 0.22s ease,
-    opacity 0.18s ease,
-    padding 0.18s ease,
-    border-width 0.18s ease;
-}
-
-.settings-color-panel.collapsed {
-  max-height: 0;
-  opacity: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  border-width: 0;
-  overflow: hidden;
-  margin-bottom: 0;
-}
-
-.settings-color-panel:not(.collapsed) {
-  max-height: 360px;
-  opacity: 1;
-  overflow: hidden;
-}
-
-#fontColorPanelArrow {
-  transition: transform 0.18s ease;
-}
-
-#fontColorPanelArrow.open {
-  transform: rotate(90deg);
-}
-
-/* Better colour buttons */
-.color-choice {
-  position: relative;
-  min-height: 42px;
-  border-radius: 14px;
-  border: 1px solid var(--af-border);
-  background: var(--af-surface-2);
-  color: var(--af-text);
-  font-size: 11px;
-  font-weight: 900;
-  overflow: hidden;
-}
-
-.color-choice::before {
-  content: "";
-  position: absolute;
-  left: 9px;
-  top: 50%;
-  width: 12px;
-  height: 12px;
-  border-radius: 999px;
-  transform: translateY(-50%);
-  background: currentColor;
-  border: 1px solid var(--af-border);
-}
-
-.color-choice[data-color="#ffffff"]::before {
-  background: #ffffff;
-}
-
-.color-choice[data-color="#000000"]::before {
-  background: #000000;
-}
-
-.color-choice[data-color="#ef4444"]::before {
-  background: #ef4444;
-}
-
-.color-choice[data-color="#f97316"]::before {
-  background: #f97316;
-}
-
-.color-choice[data-color="#eab308"]::before {
-  background: #eab308;
-}
-
-.color-choice[data-color="#22c55e"]::before {
-  background: #22c55e;
-}
-
-.color-choice[data-color="#06b6d4"]::before {
-  background: #06b6d4;
-}
-
-.color-choice[data-color="#3b82f6"]::before {
-  background: #3b82f6;
-}
-
-.color-choice[data-color="#8b5cf6"]::before {
-  background: #8b5cf6;
-}
-
-.color-choice[data-color="#ec4899"]::before {
-  background: #ec4899;
-}
-  
-/* FINAL GLOBAL APP COLOUR + HREF BUTTON FIX */
-body[data-app-color] .app-shell,
-body[data-app-color] .topbar,
-body[data-app-color] .bottom-nav,
-body[data-app-color] .card,
-body[data-app-color] .panel,
-body[data-app-color] .glass,
-body[data-app-color] .settings-list,
-body[data-app-color] .settings-support-list,
-body[data-app-color] .settings-color-wrap,
-body[data-app-color] .settings-color-panel,
-body[data-app-color] .settings-profile-card,
-body[data-app-color] .developer-credit-line,
-body[data-app-color] .form-card,
-body[data-app-color] .placeholder-card,
-body[data-app-color] .request-card,
-body[data-app-color] .page-head,
-body[data-app-color] .modal-card { border-color: var(--af-app-color-border) !important; }
-body[data-app-color] .settings-row,
-body[data-app-color] .action-card,
-body[data-app-color] .language-btn,
-body[data-app-color] .app-btn,
-body[data-app-color] .mini-btn,
-body[data-app-color] .back-btn,
-body[data-app-color] .top-icon-btn,
-body[data-app-color] .nav-btn,
-body[data-app-color] .nav-link { border-color: var(--af-app-color-border) !important; }
-body[data-app-color] .settings-row-icon,
-body[data-app-color] .action-card .icon,
-body[data-app-color] .settings-avatar { background: var(--af-app-color-soft) !important; border-color: var(--af-app-color-border) !important; }
-.settings-color-wrap { overflow:hidden; margin-bottom:12px; border-radius:22px; background:var(--af-surface); border:1px solid var(--af-border); box-shadow:var(--af-shadow-soft); }
-.settings-color-wrap > .settings-row { border-bottom:1px solid var(--af-soft-border); }
-a.settings-row, a.language-btn, a.action-card { cursor:pointer; }
-.color-choice { padding-left:26px !important; }
-.color-choice::before { background: currentColor !important; }
-.color-choice[data-color="#ffffff"] { color:#ffffff !important; text-shadow:0 0 1px #000; }
-.color-choice[data-color="#000000"] { color:#000000 !important; }
-.color-choice[data-color="#ef4444"] { color:#ef4444 !important; }
-.color-choice[data-color="#f97316"] { color:#f97316 !important; }
-.color-choice[data-color="#eab308"] { color:#eab308 !important; }
-.color-choice[data-color="#22c55e"] { color:#22c55e !important; }
-.color-choice[data-color="#06b6d4"] { color:#06b6d4 !important; }
-.color-choice[data-color="#3b82f6"] { color:#3b82f6 !important; }
-.color-choice[data-color="#8b5cf6"] { color:#8b5cf6 !important; }
-.color-choice[data-color="#ec4899"] { color:#ec4899 !important; }
-
   </style>
 </head>
 
-<body>
-  <main class="app-shell">
-    <header class="topbar">
-      <div class="top-row">
-        <div class="brand">
-          <img
-            src="AF LOGO 1.jpeg"
-            class="app-logo"
-            alt="AcademeForge Logo"
-            onerror="this.style.display='none'"
-          />
-          <div class="brand-copy">
-            <h1>AcademeForge</h1>
-            <p>Learning Beyond the Classroom</p>
+<body class="af-light">
+  <main class="app-shell" id="appShell">
+    <!-- =====================================================
+         HOME SECTION
+    ====================================================== -->
+    <section class="section active" id="homeSection" data-page="home">
+      <header class="topbar">
+        <div class="top-row">
+          <div class="brand">
+            <img
+              class="app-logo"
+              src="https://academeforge.in/wp-content/uploads/2025/12/cropped-AcademeForge-logo-512.png"
+              alt="AcademeForge"
+              loading="eager"
+              decoding="async"
+            />
+            <div class="brand-copy">
+              <h1>AcademeForge</h1>
+              <p>Student app preview</p>
+            </div>
           </div>
+
+          <button
+            type="button"
+            class="top-icon-btn"
+            aria-label="Open notifications"
+            onclick="showPage('notifications')"
+          >
+            N
+          </button>
+
+          <button
+            type="button"
+            class="top-icon-btn"
+            aria-label="Open settings"
+            onclick="showPage('settings')"
+          >
+            ⚙
+          </button>
         </div>
+      </header>
 
-        <button
-          type="button"
-          class="top-icon-btn"
-          onclick="navigateTo('learningHeatmap')"
-          aria-label="Open learning streak"
-        >
-          <span aria-hidden="true">↯</span>
-        </button>
-
-        <button
-          type="button"
-          class="top-icon-btn"
-          onclick="navigateTo('notifications')"
-          aria-label="Open notifications"
-        >
-          <span aria-hidden="true">!</span>
-        </button>
-      </div>
-    </header>
-
-    <!-- =========================================================
-         HOME
-    ========================================================== -->
-    <section id="home" class="section active" aria-label="Home page">
-      <div class="home-banner-slider glass" id="homeBannerSlider">
+      <div
+        class="home-banner-slider"
+        id="homeBannerSlider"
+        aria-label="AcademeForge visual preview slider"
+      >
         <div class="banner-slide active">
-          <img src="banner1.png" alt="AcademeForge Banner 1" />
+          <img
+            src="https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=900&q=70"
+            alt="Students learning together"
+            loading="eager"
+            decoding="async"
+          />
         </div>
 
         <div class="banner-slide">
-          <img src="banner2.png" alt="AcademeForge Banner 2" />
+          <img
+            src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=70"
+            alt="Online learning dashboard"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
 
         <div class="banner-slide">
-          <img src="Banner3.png" alt="AcademeForge Banner 3" />
+          <img
+            src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=900&q=70"
+            alt="Study workspace"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
 
-        <div class="banner-dots" aria-label="Banner controls">
+        <div class="banner-dots" aria-label="Slider controls">
           <button
             type="button"
             class="banner-dot active"
-            onclick="goToBannerSlide(0)"
-            aria-label="Banner 1"
+            aria-label="Show banner 1"
+            onclick="goToSlide(0)"
           ></button>
-
           <button
             type="button"
             class="banner-dot"
-            onclick="goToBannerSlide(1)"
-            aria-label="Banner 2"
+            aria-label="Show banner 2"
+            onclick="goToSlide(1)"
           ></button>
-
           <button
             type="button"
             class="banner-dot"
-            onclick="goToBannerSlide(2)"
-            aria-label="Banner 3"
+            aria-label="Show banner 3"
+            onclick="goToSlide(2)"
           ></button>
         </div>
       </div>
 
-      <div class="moving-text-banner">
+      <div class="moving-text-banner" aria-label="Important app notice">
         <div class="moving-text-track">
-          <span>This is only a preview of the app. The original app may include more features and functions.</span>
-          <span>AcademeForge is being improved for a faster and cleaner mobile learning experience.</span>
-          <span>This is only a preview of the app. The original app may include more features and functions.</span>
-          <span>AcademeForge is being improved for a faster and cleaner mobile learning experience.</span>
+          <span>This is only the preview of the app. The original app may include more features and functions.</span>
+          <span>AcademeForge student tools are being improved for speed, clarity, and mobile use.</span>
+          <span>This is only the preview of the app. The original app may include more features and functions.</span>
+          <span>AcademeForge student tools are being improved for speed, clarity, and mobile use.</span>
         </div>
       </div>
 
@@ -1509,25 +1510,27 @@ a.settings-row, a.language-btn, a.action-card { cursor:pointer; }
         <button
           type="button"
           class="action-card"
-          onclick="navigateTo('studentaf')"
+          onclick="showPage('login')"
+          aria-label="Open student login"
         >
-          <div class="icon" aria-hidden="true">S</div>
-          <div>
-            <h3>Student Login</h3>
-            <p>Access your course dashboard.</p>
-          </div>
+          <span class="icon" aria-hidden="true">ID</span>
+          <span>
+            <h3>Login / Create ID</h3>
+            <p>Access your student profile and saved app session.</p>
+          </span>
         </button>
 
         <button
           type="button"
           class="action-card"
-          onclick="openStudentProfile()"
+          onclick="showPage('testArena')"
+          aria-label="Open AF Test Arena"
         >
-          <div class="icon" aria-hidden="true">P</div>
-          <div>
-            <h3 id="studentDashboardCardNameAf">Hi, Student</h3>
-            <p id="studentDashboardCardSubAf">Login to view profile.</p>
-          </div>
+          <span class="icon" aria-hidden="true">T</span>
+          <span>
+            <h3>AF Test Arena</h3>
+            <p>Open quizzes, ranking, and practice preview.</p>
+          </span>
         </button>
       </div>
 
@@ -1535,95 +1538,122 @@ a.settings-row, a.language-btn, a.action-card { cursor:pointer; }
         <button
           type="button"
           class="action-card wide"
-          onclick="navigateTo('explore')"
+          onclick="showPage('reportBug')"
+          aria-label="Report a bug"
         >
-          <div class="icon" aria-hidden="true">A</div>
-          <div>
-            <h3>AF Test Arena</h3>
-            <p>Attempt quizzes and check your ranking.</p>
-          </div>
+          <span class="icon" aria-hidden="true">B</span>
+          <span>
+            <h3>Report a Bug</h3>
+            <p>Send a technical issue report for the student app preview.</p>
+          </span>
         </button>
 
         <button
           type="button"
           class="action-card wide"
-          onclick="navigateTo('management')"
+          onclick="showPage('requestStatus')"
+          aria-label="Open request status"
         >
-          <div class="icon" aria-hidden="true">i</div>
-          <div>
-            <h3>About Us</h3>
-            <p>Know the story behind AcademeForge.</p>
-          </div>
+          <span class="icon" aria-hidden="true">R</span>
+          <span>
+            <h3>Request Status</h3>
+            <p>Track bug reports, contact requests, and support replies.</p>
+          </span>
+        </button>
+
+        <button
+          type="button"
+          class="action-card wide"
+          onclick="showPage('contactUs')"
+          aria-label="Open contact us"
+        >
+          <span class="icon" aria-hidden="true">C</span>
+          <span>
+            <h3>Contact Us</h3>
+            <p>Request a call, message, or email reply from the team.</p>
+          </span>
         </button>
       </div>
 
       <div class="developer-credit-line">
-        <span>This is only a preview of the app. The original app may include more features and functions.</span>
-        <small>Developed by Devraj Kumar. Made with care in India.</small>
+        <span>This is only the preview of the app.</span>
+        <small>The original app may include more features and functions. Developed by Devraj Kumar.</small>
       </div>
     </section>
 
-    <!-- =========================================================
-         SETTINGS
-    ========================================================== -->
-    <section id="settings" class="section settings-section" aria-label="Settings page">
-      <div class="settings-profile-card">
-        <div class="settings-avatar" aria-hidden="true">A</div>
+    <!-- =====================================================
+         SETTINGS SECTION
+    ====================================================== -->
+    <section class="section settings-section" id="settingsSection" data-page="settings">
+      <header class="page-head no-extra">
+        <button
+          type="button"
+          class="back-btn"
+          aria-label="Go back"
+          onclick="goBack()"
+        >
+          ‹
+        </button>
+        <div>
+          <h2>Settings</h2>
+          <p>Manage preview app controls, links, colours, and support options.</p>
+        </div>
+      </header>
 
+      <div class="settings-profile-card">
+        <div class="settings-avatar" aria-hidden="true">AF</div>
         <div class="settings-profile-info">
-          <h2 id="settingsStudentName">Hi, Student</h2>
-          <button
-            type="button"
+          <h2>Student Preview</h2>
+          <a
+            href="#"
             class="settings-profile-link"
-            onclick="openStudentProfile()"
-            aria-label="View profile"
+            onclick="showPage('login'); return false;"
           >
-            View profile
-          </button>
+            Login or create student ID
+          </a>
         </div>
       </div>
 
       <a
         href="#"
         class="settings-beta-card"
-        onclick="handleActionHref(event, function(){ toast('Official website link is disabled in this preview.'); })"
-        aria-label="Open AcademeForge official website"
+        onclick="showPage('testArena'); return false;"
       >
-        <span>Official Website</span>
+        <span>Open AF Test Arena</span>
         <span aria-hidden="true">›</span>
       </a>
 
       <div class="settings-list">
-        <div class="settings-row">
+        <button
+          type="button"
+          class="settings-row"
+          aria-label="Toggle night mode"
+          onclick="toggleTheme()"
+        >
           <div class="settings-row-left">
-            <span class="settings-row-icon" aria-hidden="true">◐</span>
+            <span class="settings-row-icon" aria-hidden="true">M</span>
             <div class="settings-row-title">
               <strong>Night Mode</strong>
-              <small>Switch between black and white reading mode.</small>
+              <small>Switch between light and dark preview mode.</small>
             </div>
           </div>
-
-          <label class="settings-switch" for="settingsDarkToggle" aria-label="Toggle dark mode">
-            <input
-              id="settingsDarkToggle"
-              type="checkbox"
-              onchange="toggleDarkMode(this.checked)"
-            />
-            <span class="settings-slider" aria-hidden="true"></span>
+          <label class="settings-switch" aria-label="Night mode switch">
+            <input type="checkbox" id="themeSwitch" />
+            <span class="settings-slider"></span>
           </label>
-        </div>
+        </button>
 
         <a
           href="#"
-          class="settings-row"
-          onclick="handleNavHref(event, \'languages\')"
-          aria-label="Open Languages"
+          class="settings-link-row"
+          onclick="showPage('languages'); return false;"
+          aria-label="Open languages"
         >
           <div class="settings-row-left">
             <span class="settings-row-icon" aria-hidden="true">L</span>
             <div class="settings-row-title">
               <strong>Languages</strong>
-              <small>Choose app language preference.</small>
+              <small>Choose app language preview.</small>
             </div>
           </div>
           <span class="settings-arrow" aria-hidden="true">›</span>
@@ -1631,8 +1661,8 @@ a.settings-row, a.language-btn, a.action-card { cursor:pointer; }
 
         <a
           href="#"
-          class="settings-row"
-          onclick="handleNavHref(event, \'explore\')"
+          class="settings-link-row"
+          onclick="showPage('testArena'); return false;"
           aria-label="Open AF Test Arena"
         >
           <div class="settings-row-left">
@@ -1647,25 +1677,25 @@ a.settings-row, a.language-btn, a.action-card { cursor:pointer; }
 
         <a
           href="#"
-          class="settings-row"
-          onclick="handleNavHref(event, \'studentaf\')"
-          aria-label="Open Login/Create ID"
+          class="settings-link-row"
+          onclick="showPage('login'); return false;"
+          aria-label="Open login"
         >
           <div class="settings-row-left">
             <span class="settings-row-icon" aria-hidden="true">ID</span>
             <div class="settings-row-title">
-              <strong>Login/Create ID</strong>
+              <strong>Login / Create ID</strong>
               <small>Access student login and profile.</small>
             </div>
           </div>
           <span class="settings-arrow" aria-hidden="true">›</span>
-        </button>
+        </a>
 
         <a
           href="#"
-          class="settings-row"
-          onclick="handleActionHref(event, openBugReportModal)"
-          aria-label="Report a Bug"
+          class="settings-link-row"
+          onclick="showPage('reportBug'); return false;"
+          aria-label="Report a bug"
         >
           <div class="settings-row-left">
             <span class="settings-row-icon" aria-hidden="true">B</span>
@@ -1679,9 +1709,9 @@ a.settings-row, a.language-btn, a.action-card { cursor:pointer; }
 
         <a
           href="#"
-          class="settings-row"
-          onclick="handleNavHref(event, \'requestStatusAf\')"
-          aria-label="Open Request Status"
+          class="settings-link-row"
+          onclick="showPage('requestStatus'); return false;"
+          aria-label="Open request status"
         >
           <div class="settings-row-left">
             <span class="settings-row-icon" aria-hidden="true">R</span>
@@ -1695,9 +1725,9 @@ a.settings-row, a.language-btn, a.action-card { cursor:pointer; }
 
         <a
           href="#"
-          class="settings-row"
-          onclick="handleNavHref(event, \'contactUsAf\')"
-          aria-label="Open Contact Us"
+          class="settings-link-row"
+          onclick="showPage('contactUs'); return false;"
+          aria-label="Open contact us"
         >
           <div class="settings-row-left">
             <span class="settings-row-icon" aria-hidden="true">C</span>
@@ -1711,9 +1741,9 @@ a.settings-row, a.language-btn, a.action-card { cursor:pointer; }
 
         <a
           href="#"
-          class="settings-row"
-          onclick="handleNavHref(event, \'learningHeatmap\')"
-          aria-label="Open Learning Heatmap"
+          class="settings-link-row"
+          onclick="showPage('learningHeatmap'); return false;"
+          aria-label="Open learning heatmap"
         >
           <div class="settings-row-left">
             <span class="settings-row-icon" aria-hidden="true">H</span>
@@ -1727,9 +1757,9 @@ a.settings-row, a.language-btn, a.action-card { cursor:pointer; }
 
         <a
           href="#"
-          class="settings-row"
-          onclick="handleNavHref(event, \'notifications\')"
-          aria-label="Open Notifications"
+          class="settings-link-row"
+          onclick="showPage('notifications'); return false;"
+          aria-label="Open notifications"
         >
           <div class="settings-row-left">
             <span class="settings-row-icon" aria-hidden="true">N</span>
@@ -1739,55 +1769,55 @@ a.settings-row, a.language-btn, a.action-card { cursor:pointer; }
             </div>
           </div>
           <span class="settings-badge">New</span>
-        </button>
+        </a>
       </div>
 
       <div class="settings-color-wrap">
-     <a
-  href="#"
-  class="settings-row"
-  onclick="handleActionHref(event, toggleFontColorPanel)"
-  aria-label="Open App Colour Options"
->
-  <div class="settings-row-left">
-    <span class="settings-row-icon" aria-hidden="true">C</span>
-    <div class="settings-row-title">
-      <strong>App Colour</strong>
-      <small>Change the full app text and accent colour.</small>
-    </div>
-  </div>
-  <span class="settings-arrow" id="fontColorPanelArrow" aria-hidden="true">›</span>
-</button>
+        <button
+          type="button"
+          class="settings-row settings-color-toggle"
+          onclick="toggleAppColourPanel()"
+          aria-label="Open app colour options"
+        >
+          <div class="settings-row-left">
+            <span class="settings-row-icon" aria-hidden="true">C</span>
+            <div class="settings-row-title">
+              <strong>App Colour</strong>
+              <small>Change accent, active states, buttons, icons, and highlights.</small>
+            </div>
+          </div>
+          <span class="settings-arrow" id="appColourPanelArrow" aria-hidden="true">›</span>
+        </button>
 
-<div
-  id="fontColorPanel"
-  class="settings-color-panel collapsed"
-  aria-hidden="true"
->
-  <h3>Choose App Colour</h3>
-  <p>Default is black and white. Select any colour to apply it across the app.</p>
+        <div
+          id="appColourPanel"
+          class="settings-color-panel collapsed"
+          aria-hidden="true"
+        >
+          <h3>Choose App Colour</h3>
+          <p>Default is black and white. These colours update the actual app accent system.</p>
 
-  <div class="color-grid">
-    <button type="button" class="color-choice" data-color="#ffffff" onclick="setAppColor('#ffffff')">White</button>
-    <button type="button" class="color-choice" data-color="#000000" onclick="setAppColor('#000000')">Black</button>
-    <button type="button" class="color-choice" data-color="#ef4444" onclick="setAppColor('#ef4444')">Red</button>
-    <button type="button" class="color-choice" data-color="#f97316" onclick="setAppColor('#f97316')">Orange</button>
-    <button type="button" class="color-choice" data-color="#eab308" onclick="setAppColor('#eab308')">Yellow</button>
-    <button type="button" class="color-choice" data-color="#22c55e" onclick="setAppColor('#22c55e')">Green</button>
-    <button type="button" class="color-choice" data-color="#06b6d4" onclick="setAppColor('#06b6d4')">Cyan</button>
-    <button type="button" class="color-choice" data-color="#3b82f6" onclick="setAppColor('#3b82f6')">Blue</button>
-    <button type="button" class="color-choice" data-color="#8b5cf6" onclick="setAppColor('#8b5cf6')">Violet</button>
-    <button type="button" class="color-choice" data-color="#ec4899" onclick="setAppColor('#ec4899')">Pink</button>
-  </div>
-</div>
+          <div class="color-grid">
+            <button type="button" class="color-choice" data-color="#ffffff" onclick="setAppColour('#ffffff')">White</button>
+            <button type="button" class="color-choice" data-color="#000000" onclick="setAppColour('#000000')">Black</button>
+            <button type="button" class="color-choice" data-color="#ef4444" onclick="setAppColour('#ef4444')">Red</button>
+            <button type="button" class="color-choice" data-color="#f97316" onclick="setAppColour('#f97316')">Orange</button>
+            <button type="button" class="color-choice" data-color="#eab308" onclick="setAppColour('#eab308')">Yellow</button>
+            <button type="button" class="color-choice" data-color="#22c55e" onclick="setAppColour('#22c55e')">Green</button>
+            <button type="button" class="color-choice" data-color="#06b6d4" onclick="setAppColour('#06b6d4')">Cyan</button>
+            <button type="button" class="color-choice" data-color="#3b82f6" onclick="setAppColour('#3b82f6')">Blue</button>
+            <button type="button" class="color-choice" data-color="#8b5cf6" onclick="setAppColour('#8b5cf6')">Violet</button>
+            <button type="button" class="color-choice" data-color="#ec4899" onclick="setAppColour('#ec4899')">Pink</button>
+          </div>
+        </div>
       </div>
-      
+
       <div class="settings-support-list">
         <a
           href="#"
-          class="settings-row"
-          onclick="handleNavHref(event, \'management\')"
-          aria-label="Open About Us"
+          class="settings-link-row"
+          onclick="showPage('aboutUs'); return false;"
+          aria-label="Open about us"
         >
           <div class="settings-row-left">
             <span class="settings-row-icon" aria-hidden="true">i</span>
@@ -1797,12 +1827,12 @@ a.settings-row, a.language-btn, a.action-card { cursor:pointer; }
             </div>
           </div>
           <span class="settings-arrow" aria-hidden="true">›</span>
-        </button>
+        </a>
 
         <a
           href="#"
-          class="settings-row"
-          onclick="handleActionHref(event, logoutStudent)"
+          class="settings-link-row"
+          onclick="logoutPreview(); return false;"
           aria-label="Logout"
         >
           <div class="settings-row-left">
@@ -1815,1019 +1845,924 @@ a.settings-row, a.language-btn, a.action-card { cursor:pointer; }
         </a>
       </div>
 
-      <div class="settings-app-version-box">
-        <strong>App Version: 09.01.2024</strong>
-        <span>Developed by Devraj Kumar. Made with care in India.</span>
+      <div class="developer-credit-line">
+        <span>App Version: 09.01.2024</span>
+        <small>Developed by Devraj Kumar. Made with care in India.</small>
       </div>
     </section>
 
-    <!-- =========================================================
-         CONTACT US
-    ========================================================== -->
-    <section id="contactUsAf" class="section" aria-label="Contact Us">
-      <div class="page-head">
-        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
-        <div>
-          <h2>Contact Us</h2>
-          <p>Request a call or email reply from the support team.</p>
-        </div>
-      </div>
-
-      <form class="form-card" id="contactUsFormAf" onsubmit="submitContactRequest(event)">
-        <div class="field">
-          <label for="contactNameAf">Full Name</label>
-          <input id="contactNameAf" type="text" maxlength="80" autocomplete="name" required />
-        </div>
-
-        <div class="field">
-          <label for="contactMobileAf">Mobile Number</label>
-          <input id="contactMobileAf" type="tel" maxlength="15" autocomplete="tel" required />
-        </div>
-
-        <div class="field">
-          <label for="contactEmailAf">Email Address</label>
-          <input id="contactEmailAf" type="email" maxlength="120" autocomplete="email" required />
-        </div>
-
-        <div class="field">
-          <label for="contactReasonAf">Reason for Contact</label>
-          <select id="contactReasonAf" required>
-            <option value="">Select a reason</option>
-            <option value="Course Access Issue">Course Access Issue</option>
-            <option value="Login or Student ID Issue">Login or Student ID Issue</option>
-            <option value="Payment or Enrollment Query">Payment or Enrollment Query</option>
-            <option value="Technical Problem">Technical Problem</option>
-            <option value="General Support">General Support</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="contactProblemAf">Describe Your Problem</label>
-          <textarea id="contactProblemAf" maxlength="1200" required></textarea>
-        </div>
-
-        <div id="contactUsMessageAf" class="status-message" aria-live="polite"></div>
-
-        <button type="submit" class="app-btn primary" id="contactSubmitBtnAf">
-          Submit Request
-        </button>
-      </form>
-    </section>
-
-    <!-- =========================================================
-         REQUEST STATUS
-    ========================================================== -->
-    <section id="requestStatusAf" class="section" aria-label="Request Status">
-      <div class="page-head">
-        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
-        <div>
-          <h2>Request Status</h2>
-          <p>Track your support requests and bug reports.</p>
-        </div>
-        <button type="button" class="mini-btn" onclick="loadRequestStatus(true)" aria-label="Refresh">↻</button>
-      </div>
-
-      <div id="requestStatusMessageAf" class="status-message show">
-        No live backend connected in this preview. Your local demo requests will appear below.
-      </div>
-
-      <div id="requestStatusListAf"></div>
-    </section>
-
-    <!-- =========================================================
-         LANGUAGES
-    ========================================================== -->
-    <section id="languages" class="section" aria-label="Languages">
-      <div class="page-head">
-        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
+    <!-- =====================================================
+         LANGUAGES SECTION
+    ====================================================== -->
+    <section class="section" id="languagesSection" data-page="languages">
+      <header class="page-head no-extra">
+        <button type="button" class="back-btn" onclick="goBack()" aria-label="Go back">‹</button>
         <div>
           <h2>Languages</h2>
-          <p>Select your preferred app language.</p>
+          <p>Select a preview language. Links use href="#" for safe app preview routing.</p>
         </div>
-      </div>
+      </header>
 
       <div class="language-grid">
-        <a href="#" class="language-btn" data-lang="en" onclick="handleLanguageHref(event, \'en\')">
-          <span>English</span><span>EN</span>
+        <a href="#" class="language-link active" data-lang="en" onclick="setLanguage('en'); return false;">
+          <span>English</span>
+          <span>EN</span>
         </a>
-        <a href="#" class="language-btn" data-lang="hi" onclick="handleLanguageHref(event, \'hi\')">
-          <span>Hindi</span><span>HI</span>
+
+        <a href="#" class="language-link" data-lang="hi" onclick="setLanguage('hi'); return false;">
+          <span>Hindi</span>
+          <span>HI</span>
         </a>
-        <a href="#" class="language-btn" data-lang="ur" onclick="handleLanguageHref(event, \'ur\')">
-          <span>Urdu</span><span>UR</span>
+
+        <a href="#" class="language-link" data-lang="bn" onclick="setLanguage('bn'); return false;">
+          <span>Bengali</span>
+          <span>BN</span>
         </a>
-        <a href="#" class="language-btn" data-lang="bn" onclick="handleLanguageHref(event, \'bn\')">
-          <span>Bengali</span><span>BN</span>
+
+        <a href="#" class="language-link" data-lang="ta" onclick="setLanguage('ta'); return false;">
+          <span>Tamil</span>
+          <span>TA</span>
         </a>
-        <a href="#" class="language-btn" data-lang="ta" onclick="handleLanguageHref(event, \'ta\')">
-          <span>Tamil</span><span>TA</span>
+
+        <a href="#" class="language-link" data-lang="te" onclick="setLanguage('te'); return false;">
+          <span>Telugu</span>
+          <span>TE</span>
+        </a>
+
+        <a href="#" class="language-link" data-lang="mr" onclick="setLanguage('mr'); return false;">
+          <span>Marathi</span>
+          <span>MR</span>
         </a>
       </div>
     </section>
 
-    <!-- =========================================================
-         OTHER PAGES
-    ========================================================== -->
-    <section id="studentaf" class="section" aria-label="Student">
-      <div class="page-head">
-        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
+    <!-- =====================================================
+         LOGIN SECTION
+    ====================================================== -->
+    <section class="section" id="loginSection" data-page="login">
+      <header class="page-head no-extra">
+        <button type="button" class="back-btn" onclick="goBack()" aria-label="Go back">‹</button>
         <div>
-          <h2>Student</h2>
-          <p>Student login and profile access page.</p>
+          <h2>Login</h2>
+          <p>Create or open a local preview student ID.</p>
         </div>
-      </div>
+      </header>
 
-      <div class="placeholder-card">
-        <h3>Student Area</h3>
-        <p>This section is ready for your existing student login/dashboard code.</p>
-      </div>
-    </section>
-
-    <section id="batchaf" class="section" aria-label="Batches">
-      <div class="page-head">
-        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
-        <div>
-          <h2>Batches</h2>
-          <p>Batch list and enrolled course details.</p>
-        </div>
-      </div>
-
-      <div class="placeholder-card">
-        <h3>Batches</h3>
-        <p>This section is ready for your existing batches page code.</p>
-      </div>
-    </section>
-
-    <section id="community" class="section" aria-label="Community">
-      <div class="page-head">
-        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
-        <div>
-          <h2>Community</h2>
-          <p>Community discussion and updates page.</p>
-        </div>
-      </div>
-
-      <div class="placeholder-card">
-        <h3>Community</h3>
-        <p>This section is ready for your existing community page code.</p>
-      </div>
-    </section>
-
-    <section id="explore" class="section" aria-label="AF Test Arena">
-      <div class="page-head">
-        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
-        <div>
-          <h2>AF Test Arena</h2>
-          <p>Quiz, test and ranking area.</p>
-        </div>
-      </div>
-
-      <div class="placeholder-card">
-        <h3>AF Test Arena</h3>
-        <p>This section is ready for your quiz/test arena code.</p>
-      </div>
-    </section>
-
-    <section id="management" class="section" aria-label="About Us">
-      <div class="page-head">
-        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
-        <div>
-          <h2>About Us</h2>
-          <p>AcademeForge information page.</p>
-        </div>
-      </div>
-
-      <div class="placeholder-card">
-        <h3>AcademeForge</h3>
-        <p>AcademeForge is built to support students with a cleaner, faster and more focused learning experience.</p>
-      </div>
-    </section>
-
-    <section id="learningHeatmap" class="section" aria-label="Learning Heatmap">
-      <div class="page-head">
-        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
-        <div>
-          <h2>Learning Heatmap</h2>
-          <p>Weekly online learning activity.</p>
-        </div>
-      </div>
-
-      <div class="placeholder-card">
-        <h3>This Week</h3>
-        <p>Login daily to keep your learning streak active. Backend sync can be connected here.</p>
-      </div>
-    </section>
-
-    <section id="notifications" class="section" aria-label="Notifications">
-      <div class="page-head">
-        <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
-        <div>
-          <h2>Notifications</h2>
-          <p>Important updates and alerts.</p>
-        </div>
-      </div>
-
-      <div class="placeholder-card">
-        <h3>No new notifications</h3>
-        <p>Notifications from your backend can be rendered in this section.</p>
-      </div>
-    </section>
-  </main>
-
-  <!-- =========================================================
-       BOTTOM NAVIGATION
-  ========================================================== -->
-  <nav class="bottom-nav" aria-label="Bottom navigation">
-    <button
-      type="button"
-      class="nav-btn active"
-      data-section="home"
-      onclick="navigateTo('home')"
-      aria-label="Home"
-    >
-      <span class="nav-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-5h5v5"/></svg>
-      </span>
-      <span>Home</span>
-    </button>
-
-    <a
-      href="#"
-      class="nav-link"
-      data-section="studentaf"
-      onclick="handleNavHref(event, 'studentaf')"
-      aria-label="Student"
-    >
-      <span class="nav-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M4 9 12 5l8 4-8 4-8-4Z"/><path d="M7 11.5V16c0 1.3 2.2 2.5 5 2.5s5-1.2 5-2.5v-4.5"/></svg>
-      </span>
-      <span>Student</span>
-    </a>
-
-    <a
-      href="#"
-      class="nav-link"
-      data-section="batchaf"
-      onclick="handleNavHref(event, 'batchaf')"
-      aria-label="Batches"
-    >
-      <span class="nav-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4Z"/><path d="M8 4v16"/><path d="M11 8h5"/><path d="M11 12h5"/></svg>
-      </span>
-      <span>Batches</span>
-    </a>
-
-    <a
-      href="#"
-      class="nav-link"
-      data-section="community"
-      onclick="handleNavHref(event, 'community')"
-      aria-label="Community"
-    >
-      <span class="nav-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M7 10a4 4 0 1 1 8 0"/><path d="M3.5 20a7.5 7.5 0 0 1 15 0"/><path d="M17 9.5a3 3 0 0 1 0 6"/><path d="M19 20a5 5 0 0 0-2.5-4.3"/></svg>
-      </span>
-      <span>Community</span>
-    </a>
-
-    <button
-      type="button"
-      class="nav-btn"
-      data-section="settings"
-      onclick="navigateTo('settings')"
-      aria-label="Settings"
-    >
-      <span class="nav-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M19 12a7.3 7.3 0 0 0-.1-1.2l2-1.5-2-3.5-2.4 1a7 7 0 0 0-2-1.2L14.2 3h-4.4l-.3 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.5 2 1.5A7.3 7.3 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.5 2.4-1a7 7 0 0 0 2 1.2l.3 2.6h4.4l.3-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.5-2-1.5c.1-.4.1-.8.1-1.2Z"/></svg>
-      </span>
-      <span>Settings</span>
-    </button>
-  </nav>
-
-  <!-- =========================================================
-       BUG REPORT MODAL
-  ========================================================== -->
-  <div
-    id="bugReportOverlay"
-    class="modal-overlay"
-    aria-hidden="true"
-    onclick="closeBugReportModal()"
-  >
-    <div
-      class="modal-card"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="bugReportTitle"
-      onclick="event.stopPropagation()"
-    >
-      <h3 id="bugReportTitle">Report a Bug</h3>
-      <p>Describe the issue clearly. This preview stores the report locally unless you connect a backend.</p>
-
-      <form id="bugReportForm" onsubmit="submitBugReport(event)">
+      <form class="form-card" onsubmit="savePreviewLogin(event)">
         <div class="field">
-          <label for="bugReporterName">Your Name</label>
-          <input id="bugReporterName" type="text" maxlength="80" autocomplete="name" required />
+          <label for="studentName">Student Name</label>
+          <input id="studentName" type="text" autocomplete="name" minlength="2" maxlength="60" required />
         </div>
 
         <div class="field">
-          <label for="bugReporterEmail">Contact Email</label>
-          <input id="bugReporterEmail" type="email" maxlength="120" autocomplete="email" required />
+          <label for="studentClass">Class / Batch</label>
+          <input id="studentClass" type="text" autocomplete="off" maxlength="40" required />
+        </div>
+
+        <button type="submit" class="app-btn primary">Save Student ID</button>
+      </form>
+    </section>
+
+    <!-- =====================================================
+         REPORT BUG SECTION
+    ====================================================== -->
+    <section class="section" id="reportBugSection" data-page="reportBug">
+      <header class="page-head no-extra">
+        <button type="button" class="back-btn" onclick="goBack()" aria-label="Go back">‹</button>
+        <div>
+          <h2>Report a Bug</h2>
+          <p>Submit a local preview bug report.</p>
+        </div>
+      </header>
+
+      <form class="form-card" onsubmit="submitBugReport(event)">
+        <div class="field">
+          <label for="bugTitle">Issue Title</label>
+          <input id="bugTitle" type="text" maxlength="80" required />
         </div>
 
         <div class="field">
-          <label for="bugCategory">Bug Category</label>
-          <select id="bugCategory" required>
-            <option value="">Select issue type</option>
-            <option value="login">Login / Student ID</option>
-            <option value="navigation">Navigation</option>
-            <option value="theme">Theme / Reading Mode</option>
-            <option value="notification">Notifications</option>
-            <option value="ui">UI / Design</option>
-            <option value="performance">Slow / Lagging</option>
-            <option value="other">Other</option>
+          <label for="bugDetails">Issue Details</label>
+          <textarea id="bugDetails" maxlength="600" required></textarea>
+        </div>
+
+        <button type="submit" class="app-btn primary">Submit Bug Report</button>
+      </form>
+    </section>
+
+    <!-- =====================================================
+         CONTACT US SECTION
+    ====================================================== -->
+    <section class="section" id="contactUsSection" data-page="contactUs">
+      <header class="page-head no-extra">
+        <button type="button" class="back-btn" onclick="goBack()" aria-label="Go back">‹</button>
+        <div>
+          <h2>Contact Us</h2>
+          <p>Request a call, message, or email reply.</p>
+        </div>
+      </header>
+
+      <form class="form-card" onsubmit="submitContactRequest(event)">
+        <div class="field">
+          <label for="contactName">Name</label>
+          <input id="contactName" type="text" maxlength="60" required />
+        </div>
+
+        <div class="field">
+          <label for="contactMethod">Preferred Contact</label>
+          <select id="contactMethod" required>
+            <option value="Call">Call</option>
+            <option value="Email">Email</option>
+            <option value="Message">Message</option>
           </select>
         </div>
 
         <div class="field">
-          <label for="bugDescription">What happened?</label>
-          <textarea id="bugDescription" maxlength="1200" required></textarea>
+          <label for="contactMessage">Message</label>
+          <textarea id="contactMessage" maxlength="600" required></textarea>
         </div>
 
-        <div id="bugReportStatus" class="status-message" aria-live="polite"></div>
-
-        <button type="submit" class="app-btn primary" id="bugReportSubmitBtn">
-          Submit Report
-        </button>
-
-        <button
-          type="button"
-          class="app-btn"
-          style="width:100%; margin-top:10px;"
-          onclick="closeBugReportModal()"
-        >
-          Close
-        </button>
+        <button type="submit" class="app-btn primary">Send Contact Request</button>
       </form>
-    </div>
-  </div>
+    </section>
 
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <!-- =====================================================
+         REQUEST STATUS SECTION
+    ====================================================== -->
+    <section class="section" id="requestStatusSection" data-page="requestStatus">
+      <header class="page-head no-extra">
+        <button type="button" class="back-btn" onclick="goBack()" aria-label="Go back">‹</button>
+        <div>
+          <h2>Request Status</h2>
+          <p>Track locally saved bug reports and contact requests.</p>
+        </div>
+      </header>
 
-  <script>
+      <div id="requestStatusList"></div>
+    </section>
+
+    <!-- =====================================================
+         PLACEHOLDER PAGES
+    ====================================================== -->
+    <section class="section" id="testArenaSection" data-page="testArena">
+      <header class="page-head no-extra">
+        <button type="button" class="back-btn" onclick="goBack()" aria-label="Go back">‹</button>
+        <div>
+          <h2>AF Test Arena</h2>
+          <p>Quiz and ranking preview.</p>
+        </div>
+      </header>
+      <div class="placeholder-card">
+        <h3>Test Arena Preview</h3>
+        <p>This section is a preview. The original app may include quizzes, leaderboard, attempts, analytics, and ranking tools.</p>
+      </div>
+    </section>
+
+    <section class="section" id="learningHeatmapSection" data-page="learningHeatmap">
+      <header class="page-head no-extra">
+        <button type="button" class="back-btn" onclick="goBack()" aria-label="Go back">‹</button>
+        <div>
+          <h2>Learning Heatmap</h2>
+          <p>Weekly activity preview.</p>
+        </div>
+      </header>
+      <div class="placeholder-card">
+        <h3>Learning Heatmap</h3>
+        <p>Activity tracking will show weekly learning consistency, practice days, and progress indicators.</p>
+      </div>
+    </section>
+
+    <section class="section" id="notificationsSection" data-page="notifications">
+      <header class="page-head no-extra">
+        <button type="button" class="back-btn" onclick="goBack()" aria-label="Go back">‹</button>
+        <div>
+          <h2>Notifications</h2>
+          <p>Important app updates.</p>
+        </div>
+      </header>
+      <div class="placeholder-card">
+        <h3>No new notifications</h3>
+        <p>Preview notifications will appear here when app updates, support replies, or learning reminders are available.</p>
+      </div>
+    </section>
+
+    <section class="section" id="aboutUsSection" data-page="aboutUs">
+      <header class="page-head no-extra">
+        <button type="button" class="back-btn" onclick="goBack()" aria-label="Go back">‹</button>
+        <div>
+          <h2>About Us</h2>
+          <p>AcademeForge preview information.</p>
+        </div>
+      </header>
+      <div class="placeholder-card">
+        <h3>AcademeForge</h3>
+        <p>AcademeForge is a student-focused learning platform preview. This app layout is designed for fast loading, consistent mobile visuals, and lightweight navigation.</p>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         BOTTOM NAV
+         Home + Settings = buttons.
+         Student/Batches/Community = href="#" anchors.
+    ====================================================== -->
+    <nav class="bottom-nav" aria-label="Bottom navigation">
+      <button
+        type="button"
+        class="nav-btn active"
+        data-nav="home"
+        onclick="showPage('home')"
+        aria-label="Open Home"
+      >
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 11.5 12 4l9 7.5"></path>
+            <path d="M5.5 10.5V20h13v-9.5"></path>
+            <path d="M9.5 20v-6h5v6"></path>
+          </svg>
+        </span>
+        <span>Home</span>
+      </button>
+
+      <a
+        href="#"
+        class="nav-link"
+        data-nav="student"
+        onclick="showPreviewBlocked('Student'); return false;"
+        aria-label="Open Student"
+      >
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 9 12 5l8 4-8 4-8-4Z"></path>
+            <path d="M7 11.5v4c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5v-4"></path>
+          </svg>
+        </span>
+        <span>Student</span>
+      </a>
+
+      <a
+        href="#"
+        class="nav-link"
+        data-nav="batches"
+        onclick="showPreviewBlocked('Batches'); return false;"
+        aria-label="Open Batches"
+      >
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M6 4h12v16H6z"></path>
+            <path d="M9 8h6"></path>
+            <path d="M9 12h6"></path>
+            <path d="M9 16h4"></path>
+          </svg>
+        </span>
+        <span>Batches</span>
+      </a>
+
+      <a
+        href="#"
+        class="nav-link"
+        data-nav="community"
+        onclick="showPreviewBlocked('Community'); return false;"
+        aria-label="Open Community"
+      >
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"></path>
+            <path d="M16 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"></path>
+            <path d="M3.5 20c.4-3 2.2-5 4.5-5s4.1 2 4.5 5"></path>
+            <path d="M11.5 20c.4-3 2.2-5 4.5-5s4.1 2 4.5 5"></path>
+          </svg>
+        </span>
+        <span>Community</span>
+      </a>
+
+      <button
+        type="button"
+        class="nav-btn"
+        data-nav="settings"
+        onclick="showPage('settings')"
+        aria-label="Open Settings"
+      >
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
+            <path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.04.04a2.1 2.1 0 1 1-2.98 2.98l-.04-.04A1.8 1.8 0 0 0 15 19.4a1.8 1.8 0 0 0-1 .6 1.8 1.8 0 0 0-.5 1.27V21.4a2.1 2.1 0 1 1-4.2 0v-.13A1.8 1.8 0 0 0 8.8 20a1.8 1.8 0 0 0-1-.6 1.8 1.8 0 0 0-1.78.56l-.04.04A2.1 2.1 0 1 1 3 17.02l.04-.04A1.8 1.8 0 0 0 3.6 15a1.8 1.8 0 0 0-.6-1 1.8 1.8 0 0 0-1.27-.5H1.6a2.1 2.1 0 1 1 0-4.2h.13A1.8 1.8 0 0 0 3 8.8a1.8 1.8 0 0 0 .6-1 1.8 1.8 0 0 0-.56-1.78L3 5.98A2.1 2.1 0 1 1 5.98 3l.04.04A1.8 1.8 0 0 0 8 3.6a1.8 1.8 0 0 0 1-.6 1.8 1.8 0 0 0 .5-1.27V1.6a2.1 2.1 0 1 1 4.2 0v.13A1.8 1.8 0 0 0 14.2 3a1.8 1.8 0 0 0 1 .6 1.8 1.8 0 0 0 1.78-.56l.04-.04A2.1 2.1 0 1 1 20 5.98l-.04.04A1.8 1.8 0 0 0 19.4 8c.2.38.43.72.6 1a1.8 1.8 0 0 0 1.27.5h.13a2.1 2.1 0 1 1 0 4.2h-.13A1.8 1.8 0 0 0 20 14c-.17.28-.4.62-.6 1Z"></path>
+          </svg>
+        </span>
+        <span>Settings</span>
+      </button>
+    </nav>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </main>
+    <script>
     /* =========================================================
-       ACADEMEFORGE SINGLE FILE SCRIPT
-       - Section navigation
-       - Browser/mobile back button support
-       - Black/white theme
-       - Font color picker
-       - Local demo request status
+       ACADEMEFORGE SINGLE FILE MOBILE APP
+       PART 3/3: JAVASCRIPT
+       - Page router with browser/mobile back button support
+       - Real app colour accent system
+       - href="#" preview-safe links
+       - Local request status storage
+       - Lightweight slider
     ========================================================= */
 
     (function () {
       "use strict";
 
       const STORAGE_KEYS = Object.freeze({
-        theme: "af_theme_mode",
-        fontColor: "af_font_color",
-        language: "af_language",
-        studentName: "af_student_name",
-        contactRequests: "af_contact_requests",
-        bugReports: "af_bug_reports"
+        theme: "af_preview_theme",
+        appColour: "af_preview_app_colour",
+        language: "af_preview_language",
+        student: "af_preview_student",
+        requests: "af_preview_requests"
       });
 
-      const VALID_SECTIONS = new Set([
-        "home",
-        "settings",
-        "studentaf",
-        "batchaf",
-        "community",
-        "explore",
-        "management",
-        "learningHeatmap",
-        "notifications",
-        "contactUsAf",
-        "requestStatusAf",
-        "languages"
+      const PAGE_IDS = Object.freeze({
+        home: "homeSection",
+        settings: "settingsSection",
+        languages: "languagesSection",
+        login: "loginSection",
+        reportBug: "reportBugSection",
+        contactUs: "contactUsSection",
+        requestStatus: "requestStatusSection",
+        testArena: "testArenaSection",
+        learningHeatmap: "learningHeatmapSection",
+        notifications: "notificationsSection",
+        aboutUs: "aboutUsSection"
+      });
+
+      const PAGE_TITLES = Object.freeze({
+        home: "Home",
+        settings: "Settings",
+        languages: "Languages",
+        login: "Login",
+        reportBug: "Report a Bug",
+        contactUs: "Contact Us",
+        requestStatus: "Request Status",
+        testArena: "AF Test Arena",
+        learningHeatmap: "Learning Heatmap",
+        notifications: "Notifications",
+        aboutUs: "About Us"
+      });
+
+      const VALID_APP_COLOURS = Object.freeze([
+        "#ffffff",
+        "#000000",
+        "#ef4444",
+        "#f97316",
+        "#eab308",
+        "#22c55e",
+        "#06b6d4",
+        "#3b82f6",
+        "#8b5cf6",
+        "#ec4899"
       ]);
 
-      let currentBannerIndex = 0;
-      let bannerTimer = null;
-      let internalPopLock = false;
+      let currentPage = "home";
+      let slideIndex = 0;
+      let sliderTimer = 0;
+      let toastTimer = 0;
+      let isBooted = false;
 
-      function byId(id) {
-        return document.getElementById(id);
+      function qs(selector, root) {
+        return (root || document).querySelector(selector);
       }
 
-      function all(selector, root) {
-        return Array.from((root || document).querySelectorAll(selector));
+      function qsa(selector, root) {
+        return Array.prototype.slice.call((root || document).querySelectorAll(selector));
       }
 
-      function safeText(value) {
+      function safeString(value) {
         return String(value == null ? "" : value).trim();
       }
 
-      function isEmail(value) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(safeText(value));
+      function clampText(value, maxLength) {
+        const text = safeString(value);
+        if (text.length <= maxLength) return text;
+        return text.slice(0, maxLength).trim();
       }
 
-      function escapeHtml(value) {
-        return String(value == null ? "" : value).replace(/[&<>"']/g, function (char) {
-          return {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#039;"
-          }[char];
+      function safeJsonParse(value, fallback) {
+        try {
+          const parsed = JSON.parse(value);
+          return parsed == null ? fallback : parsed;
+        } catch (error) {
+          return fallback;
+        }
+      }
+
+      function getPageFromHash() {
+        const hash = safeString(window.location.hash).replace(/^#/, "");
+        if (!hash) return "home";
+        return Object.prototype.hasOwnProperty.call(PAGE_IDS, hash) ? hash : "home";
+      }
+
+      function setMetaThemeColor(color) {
+        const metaTheme = qs('meta[name="theme-color"]');
+        if (metaTheme) {
+          metaTheme.setAttribute("content", color);
+        }
+      }
+
+      function normalizeAppColour(colour) {
+        const value = safeString(colour).toLowerCase();
+        if (!/^#[0-9a-f]{6}$/i.test(value)) return "";
+        return VALID_APP_COLOURS.indexOf(value) >= 0 ? value : "";
+      }
+
+      function hexToRgb(colour) {
+        const safeColour = normalizeAppColour(colour) || getDefaultAppColour();
+        const hex = safeColour.replace("#", "");
+
+        return {
+          r: parseInt(hex.slice(0, 2), 16),
+          g: parseInt(hex.slice(2, 4), 16),
+          b: parseInt(hex.slice(4, 6), 16)
+        };
+      }
+
+      function getDefaultAppColour() {
+        return document.body.classList.contains("af-dark") ? "#ffffff" : "#000000";
+      }
+
+      function getReadableTextColour(bgColour) {
+        const safeColour = normalizeAppColour(bgColour) || getDefaultAppColour();
+        const rgb = hexToRgb(safeColour);
+        const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+        return brightness > 150 ? "#000000" : "#ffffff";
+      }
+
+      function applyAppColour(colour, persist) {
+        const safeColour = normalizeAppColour(colour) || getDefaultAppColour();
+        const rgb = hexToRgb(safeColour);
+        const readableText = getReadableTextColour(safeColour);
+        const root = document.documentElement;
+
+        root.style.setProperty("--af-app-color", safeColour);
+        root.style.setProperty("--af-app-color-rgb", rgb.r + ", " + rgb.g + ", " + rgb.b);
+        root.style.setProperty("--af-app-color-soft", "rgba(" + rgb.r + ", " + rgb.g + ", " + rgb.b + ", 0.08)");
+        root.style.setProperty("--af-app-color-mid", "rgba(" + rgb.r + ", " + rgb.g + ", " + rgb.b + ", 0.16)");
+        root.style.setProperty("--af-app-color-strong", "rgba(" + rgb.r + ", " + rgb.g + ", " + rgb.b + ", 0.30)");
+        root.style.setProperty("--af-primary", safeColour);
+        root.style.setProperty("--af-primary-text", readableText);
+
+        document.body.setAttribute("data-app-colour", safeColour);
+
+        qsa(".color-choice").forEach(function (button) {
+          button.classList.toggle("active", button.getAttribute("data-color") === safeColour);
         });
+
+        setMetaThemeColor(safeColour);
+
+        if (persist) {
+          localStorage.setItem(STORAGE_KEYS.appColour, safeColour);
+        }
       }
 
-      function getActiveSectionId() {
-        const active = document.querySelector(".section.active");
-        return active ? active.id : "home";
+      function setAppColour(colour) {
+        applyAppColour(colour, true);
+        toast("App colour updated.");
       }
 
-      function setMetaThemeColor() {
-        const meta = document.querySelector('meta[name="theme-color"]');
-        if (!meta) return;
-        meta.setAttribute("content", document.body.classList.contains("af-dark") ? "#000000" : "#ffffff");
+      function hydrateAppColour() {
+        const savedColour = normalizeAppColour(localStorage.getItem(STORAGE_KEYS.appColour));
+        applyAppColour(savedColour || getDefaultAppColour(), false);
       }
 
-      function updateNavActive(sectionId) {
-        all(".bottom-nav [data-section]").forEach(function (item) {
-          const active = item.getAttribute("data-section") === sectionId;
-          item.classList.toggle("active", active);
-          if (active) {
-            item.setAttribute("aria-current", "page");
-          } else {
-            item.removeAttribute("aria-current");
-          }
+      function toggleAppColourPanel() {
+        const panel = qs("#appColourPanel");
+        const arrow = qs("#appColourPanelArrow");
+
+        if (!panel) return;
+
+        const shouldOpen = panel.classList.contains("collapsed");
+        panel.classList.toggle("collapsed", !shouldOpen);
+        panel.setAttribute("aria-hidden", shouldOpen ? "false" : "true");
+
+        if (arrow) {
+          arrow.classList.toggle("open", shouldOpen);
+        }
+      }
+
+      function applyTheme(theme, persist) {
+        const nextTheme = theme === "dark" ? "dark" : "light";
+        const isDark = nextTheme === "dark";
+        const themeSwitch = qs("#themeSwitch");
+
+        document.body.classList.toggle("af-dark", isDark);
+        document.body.classList.toggle("af-light", !isDark);
+
+        if (themeSwitch) {
+          themeSwitch.checked = isDark;
+        }
+
+        if (persist) {
+          localStorage.setItem(STORAGE_KEYS.theme, nextTheme);
+        }
+
+        const savedColour = normalizeAppColour(localStorage.getItem(STORAGE_KEYS.appColour));
+        applyAppColour(savedColour || getDefaultAppColour(), false);
+      }
+
+      function hydrateTheme() {
+        const savedTheme = safeString(localStorage.getItem(STORAGE_KEYS.theme));
+        if (savedTheme === "dark" || savedTheme === "light") {
+          applyTheme(savedTheme, false);
+          return;
+        }
+
+        const prefersDark =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+        applyTheme(prefersDark ? "dark" : "light", false);
+      }
+
+      function toggleTheme() {
+        const isDark = document.body.classList.contains("af-dark");
+        applyTheme(isDark ? "light" : "dark", true);
+        toast(isDark ? "Light mode enabled." : "Night mode enabled.");
+      }
+
+      function updateActiveNav(page) {
+        qsa(".nav-btn, .nav-link").forEach(function (item) {
+          item.classList.remove("active");
         });
+
+        if (page === "home") {
+          const homeNav = qs('[data-nav="home"]');
+          if (homeNav) homeNav.classList.add("active");
+          return;
+        }
+
+        if (page === "settings") {
+          const settingsNav = qs('[data-nav="settings"]');
+          if (settingsNav) settingsNav.classList.add("active");
+        }
       }
 
-      function showSection(sectionId, options) {
-        const opts = options || {};
-        const id = VALID_SECTIONS.has(sectionId) ? sectionId : "home";
-        const target = byId(id);
+      function renderPage(page) {
+        const safePage = Object.prototype.hasOwnProperty.call(PAGE_IDS, page) ? page : "home";
+        const targetId = PAGE_IDS[safePage];
 
-        if (!target) return;
-
-        all(".section").forEach(function (section) {
+        qsa(".section").forEach(function (section) {
           section.classList.remove("active");
-          section.setAttribute("aria-hidden", "true");
         });
 
-        target.classList.add("active");
-        target.setAttribute("aria-hidden", "false");
-
-        updateNavActive(id);
-        hydrateSettingsName();
-
-        if (id === "requestStatusAf") {
-          loadRequestStatus(false);
+        const target = qs("#" + targetId);
+        if (target) {
+          target.classList.add("active");
         }
 
-        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+        currentPage = safePage;
+        updateActiveNav(safePage);
 
-        if (opts.push !== false) {
-          const state = { section: id };
-          const hash = "#" + id;
-          if (location.hash !== hash) {
-            history.pushState(state, "", hash);
-          } else {
-            history.replaceState(state, "", hash);
-          }
+        if (safePage === "requestStatus") {
+          renderRequestStatus();
         }
+
+        window.scrollTo({
+          top: 0,
+          left: 0,
+          behavior: "instant" in document.documentElement.style ? "instant" : "auto"
+        });
+
+        document.title = "AcademeForge - " + (PAGE_TITLES[safePage] || "Preview");
       }
 
-      function navigateTo(sectionId) {
-        showSection(sectionId, { push: true });
+      function showPage(page) {
+        const safePage = Object.prototype.hasOwnProperty.call(PAGE_IDS, page) ? page : "home";
+
+        if (safePage === currentPage && isBooted) {
+          return;
+        }
+
+        renderPage(safePage);
+
+        const nextHash = "#" + safePage;
+        if (window.location.hash !== nextHash) {
+          history.pushState({ page: safePage }, "", nextHash);
+        }
       }
 
       function goBack() {
-        if (history.length > 1) {
+        if (history.length > 1 && currentPage !== "home") {
           history.back();
           return;
         }
-        showSection("home", { push: true });
+
+        showPage("home");
       }
 
-      function handleNavHref(event, sectionId) {
-        event.preventDefault();
-        navigateTo(sectionId);
-      }
-
-      function initHistory() {
-        const initialHash = safeText(location.hash).replace("#", "");
-        const initialSection = VALID_SECTIONS.has(initialHash) ? initialHash : "home";
-
-        history.replaceState({ section: initialSection }, "", "#" + initialSection);
-        showSection(initialSection, { push: false });
-
-        window.addEventListener("popstate", function (event) {
-          if (internalPopLock) return;
-          const stateSection = event.state && event.state.section;
-          const hashSection = safeText(location.hash).replace("#", "");
-          const nextSection = VALID_SECTIONS.has(stateSection)
-            ? stateSection
-            : VALID_SECTIONS.has(hashSection)
-              ? hashSection
-              : "home";
-
-          showSection(nextSection, { push: false });
-        });
-      }
-
-      function hydrateSettingsName() {
-        const nameTargets = [
-          byId("settingsStudentName"),
-          byId("studentDashboardCardNameAf")
-        ];
-
-        const storedName =
-          localStorage.getItem(STORAGE_KEYS.studentName) ||
-          localStorage.getItem("student_name_af") ||
-          localStorage.getItem("studentNameaf") ||
-          "Student";
-
-        nameTargets.forEach(function (node) {
-          if (!node) return;
-          node.textContent = "Hi, " + storedName;
-        });
-      }
-
-      function applyTheme(mode) {
-        const isDark = mode === "dark";
-        document.body.classList.toggle("af-dark", isDark);
-        localStorage.setItem(STORAGE_KEYS.theme, isDark ? "dark" : "light");
-
-        const toggle = byId("settingsDarkToggle");
-        if (toggle) toggle.checked = isDark;
-
-        setMetaThemeColor();
-
-        const savedColor = localStorage.getItem(STORAGE_KEYS.fontColor);
-        if (!savedColor) {
-          document.documentElement.style.setProperty("--af-font-color", isDark ? "#ffffff" : "#000000");
-        }
-      }
-
-      function toggleDarkMode(enabled) {
-        applyTheme(enabled ? "dark" : "light");
-        toast(enabled ? "Night mode enabled." : "Light mode enabled.");
-      }
-
-function normalizeAppColor(color) {
-  const value = String(color || "").trim().toLowerCase();
-  return /^#[0-9a-f]{6}$/i.test(value) ? value : "";
-}
-
-function getDefaultAppColor() {
-  return document.body.classList.contains("af-dark") ? "#ffffff" : "#000000";
-}
-
-function hexToRgba(hex, alpha) {
-  const safe = normalizeAppColor(hex) || "#000000";
-  const raw = safe.replace("#", "");
-  const r = parseInt(raw.slice(0, 2), 16);
-  const g = parseInt(raw.slice(2, 4), 16);
-  const b = parseInt(raw.slice(4, 6), 16);
-  return "rgba(" + r + ", " + g + ", " + b + ", " + Number(alpha || 1) + ")";
-}
-
-function getReadableButtonTextColor(bgColor) {
-  const color = normalizeAppColor(bgColor) || getDefaultAppColor();
-  const hex = color.replace("#", "");
-
-  const r = parseInt(hex.slice(0, 2), 16);
-  const g = parseInt(hex.slice(2, 4), 16);
-  const b = parseInt(hex.slice(4, 6), 16);
-
-  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-  return brightness > 150 ? "#000000" : "#ffffff";
-}
-
-function setAppColor(color) {
-  const safeColor = normalizeAppColor(color) || getDefaultAppColor();
-  const readableText = getReadableButtonTextColor(safeColor);
-
-  localStorage.setItem("af_font_color", safeColor);
-
-  document.documentElement.style.setProperty("--af-app-color", safeColor);
-  document.documentElement.style.setProperty("--af-font-color", safeColor);
-  document.documentElement.style.setProperty("--af-primary", safeColor);
-  document.documentElement.style.setProperty("--af-primary-text", readableText);
-  document.documentElement.style.setProperty("--af-app-color-soft", hexToRgba(safeColor, 0.12));
-  document.documentElement.style.setProperty("--af-app-color-border", hexToRgba(safeColor, 0.42));
-
-  document.body.setAttribute("data-app-color", safeColor);
-
-  document.querySelectorAll(".color-choice").forEach(function (btn) {
-    btn.classList.toggle("active", btn.getAttribute("data-color") === safeColor);
-  });
-
-  if (typeof toast === "function") {
-    toast("App colour updated.");
-  }
-}
-
-function hydrateFontColor() {
-  const savedColor = normalizeAppColor(localStorage.getItem("af_font_color"));
-  const finalColor = savedColor || getDefaultAppColor();
-
-  setAppColor(finalColor);
-}
-
-function toggleFontColorPanel() {
-  const panel = document.getElementById("fontColorPanel");
-  const arrow = document.getElementById("fontColorPanelArrow");
-
-  if (!panel) return;
-
-  const isClosed = panel.classList.contains("collapsed");
-
-  panel.classList.toggle("collapsed", !isClosed);
-  panel.setAttribute("aria-hidden", isClosed ? "false" : "true");
-
-  if (arrow) {
-    arrow.classList.toggle("open", isClosed);
-  }
-}
-
-      function setLanguage(language) {
-        const allowed = new Set(["en", "hi", "ur", "bn", "ta"]);
-        const lang = allowed.has(language) ? language : "en";
-        localStorage.setItem(STORAGE_KEYS.language, lang);
-
-        all(".language-btn").forEach(function (btn) {
-          btn.classList.toggle("active", btn.getAttribute("data-lang") === lang);
-        });
-
-        toast("Language preference saved.");
-      }
-
-      function hydrateLanguage() {
-        const lang = localStorage.getItem(STORAGE_KEYS.language) || "en";
-        all(".language-btn").forEach(function (btn) {
-          btn.classList.toggle("active", btn.getAttribute("data-lang") === lang);
-        });
+      function showPreviewBlocked(label) {
+        const name = clampText(label, 40) || "This section";
+        toast(name + " is disabled in this preview. Original app may include this feature.");
       }
 
       function toast(message) {
-        const node = byId("toast");
-        if (!node) return;
+        const toastNode = qs("#toast");
+        if (!toastNode) return;
 
-        node.textContent = safeText(message);
-        node.classList.add("show");
+        clearTimeout(toastTimer);
+        toastNode.textContent = clampText(message, 160);
+        toastNode.classList.add("show");
 
-        clearTimeout(window.__afToastTimer);
-        window.__afToastTimer = setTimeout(function () {
-          node.classList.remove("show");
+        toastTimer = window.setTimeout(function () {
+          toastNode.classList.remove("show");
         }, 2200);
       }
 
-      function goToBannerSlide(index) {
-        const slides = all(".banner-slide");
-        const dots = all(".banner-dot");
-        if (!slides.length) return;
-
-        const next = Number.isFinite(Number(index)) ? Number(index) : 0;
-        currentBannerIndex = ((next % slides.length) + slides.length) % slides.length;
-
-        slides.forEach(function (slide, slideIndex) {
-          slide.classList.toggle("active", slideIndex === currentBannerIndex);
-        });
-
-        dots.forEach(function (dot, dotIndex) {
-          dot.classList.toggle("active", dotIndex === currentBannerIndex);
-        });
+      function getRequests() {
+        const stored = localStorage.getItem(STORAGE_KEYS.requests);
+        const parsed = safeJsonParse(stored, []);
+        return Array.isArray(parsed) ? parsed : [];
       }
 
-      function startBannerAutoPlay() {
-        clearInterval(bannerTimer);
-        bannerTimer = setInterval(function () {
-          const slides = all(".banner-slide");
-          if (slides.length <= 1) return;
-          goToBannerSlide(currentBannerIndex + 1);
-        }, 4200);
+      function saveRequests(requests) {
+        const safeRequests = Array.isArray(requests) ? requests.slice(0, 30) : [];
+        localStorage.setItem(STORAGE_KEYS.requests, JSON.stringify(safeRequests));
       }
 
-      function setupBannerTouch() {
-        const slider = byId("homeBannerSlider");
-        if (!slider) return;
+      function addRequest(request) {
+        const requests = getRequests();
+        const safeRequest = {
+          id: Date.now(),
+          type: clampText(request.type, 40),
+          title: clampText(request.title, 90),
+          details: clampText(request.details, 700),
+          status: "Received",
+          createdAt: new Date().toLocaleString()
+        };
 
-        let startX = 0;
-        let startY = 0;
-        let active = false;
-
-        slider.addEventListener("touchstart", function (event) {
-          const touch = event.touches && event.touches[0];
-          if (!touch) return;
-          active = true;
-          startX = touch.clientX;
-          startY = touch.clientY;
-        }, { passive: true });
-
-        slider.addEventListener("touchend", function (event) {
-          if (!active) return;
-          active = false;
-
-          const touch = event.changedTouches && event.changedTouches[0];
-          if (!touch) return;
-
-          const dx = touch.clientX - startX;
-          const dy = touch.clientY - startY;
-
-          if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
-
-          if (dx < 0) {
-            goToBannerSlide(currentBannerIndex + 1);
-          } else {
-            goToBannerSlide(currentBannerIndex - 1);
-          }
-
-          startBannerAutoPlay();
-        }, { passive: true });
-      }
-
-      function openStudentProfile() {
-        navigateTo("studentaf");
-      }
-
-      function openBugReportModal() {
-        const overlay = byId("bugReportOverlay");
-        const form = byId("bugReportForm");
-        const status = byId("bugReportStatus");
-
-        if (form) form.reset();
-        if (status) {
-          status.textContent = "";
-          status.classList.remove("show");
-        }
-
-        if (overlay) {
-          overlay.classList.add("show");
-          overlay.setAttribute("aria-hidden", "false");
-          document.body.style.overflow = "hidden";
-        }
-
-        setTimeout(function () {
-          const firstInput = byId("bugReporterName");
-          if (firstInput) firstInput.focus();
-        }, 80);
-      }
-
-      function closeBugReportModal() {
-        const overlay = byId("bugReportOverlay");
-        if (overlay) {
-          overlay.classList.remove("show");
-          overlay.setAttribute("aria-hidden", "true");
-        }
-        document.body.style.overflow = "";
-      }
-
-      function setStatus(nodeId, message) {
-        const node = byId(nodeId);
-        if (!node) return;
-        node.textContent = safeText(message);
-        node.classList.add("show");
-      }
-
-      function readJsonArray(key) {
-        try {
-          const parsed = JSON.parse(localStorage.getItem(key) || "[]");
-          return Array.isArray(parsed) ? parsed : [];
-        } catch (error) {
-          return [];
-        }
-      }
-
-      function writeJsonArray(key, value) {
-        localStorage.setItem(key, JSON.stringify(Array.isArray(value) ? value : []));
-      }
-
-      function submitContactRequest(event) {
-        event.preventDefault();
-
-        const name = safeText(byId("contactNameAf") && byId("contactNameAf").value);
-        const mobile = safeText(byId("contactMobileAf") && byId("contactMobileAf").value);
-        const email = safeText(byId("contactEmailAf") && byId("contactEmailAf").value);
-        const reason = safeText(byId("contactReasonAf") && byId("contactReasonAf").value);
-        const problem = safeText(byId("contactProblemAf") && byId("contactProblemAf").value);
-
-        if (name.length < 2) {
-          setStatus("contactUsMessageAf", "Please enter a valid full name.");
-          return;
-        }
-
-        if (mobile.length < 8) {
-          setStatus("contactUsMessageAf", "Please enter a valid mobile number.");
-          return;
-        }
-
-        if (!isEmail(email)) {
-          setStatus("contactUsMessageAf", "Please enter a valid email address.");
-          return;
-        }
-
-        if (!reason) {
-          setStatus("contactUsMessageAf", "Please select a contact reason.");
-          return;
-        }
-
-        if (problem.length < 10) {
-          setStatus("contactUsMessageAf", "Please describe your problem in at least 10 characters.");
-          return;
-        }
-
-        const requests = readJsonArray(STORAGE_KEYS.contactRequests);
-        requests.unshift({
-          id: "CONTACT-" + Date.now(),
-          type: "Contact Request",
-          name: name,
-          mobile: mobile,
-          email: email,
-          reason: reason,
-          problem: problem,
-          status: "Pending",
-          createdAt: new Date().toISOString()
-        });
-
-        writeJsonArray(STORAGE_KEYS.contactRequests, requests);
-
-        const form = byId("contactUsFormAf");
-        if (form) form.reset();
-
-        setStatus("contactUsMessageAf", "Your contact request has been saved in this preview.");
-        toast("Contact request submitted.");
+        requests.unshift(safeRequest);
+        saveRequests(requests);
       }
 
       function submitBugReport(event) {
         event.preventDefault();
 
-        const name = safeText(byId("bugReporterName") && byId("bugReporterName").value);
-        const email = safeText(byId("bugReporterEmail") && byId("bugReporterEmail").value);
-        const category = safeText(byId("bugCategory") && byId("bugCategory").value);
-        const description = safeText(byId("bugDescription") && byId("bugDescription").value);
+        const titleNode = qs("#bugTitle");
+        const detailsNode = qs("#bugDetails");
 
-        if (name.length < 2) {
-          setStatus("bugReportStatus", "Please enter a valid name.");
+        const title = clampText(titleNode ? titleNode.value : "", 80);
+        const details = clampText(detailsNode ? detailsNode.value : "", 600);
+
+        if (title.length < 3 || details.length < 8) {
+          toast("Please enter valid bug details.");
           return;
         }
 
-        if (!isEmail(email)) {
-          setStatus("bugReportStatus", "Please enter a valid email address.");
-          return;
-        }
-
-        if (!category) {
-          setStatus("bugReportStatus", "Please select a bug category.");
-          return;
-        }
-
-        if (description.length < 10) {
-          setStatus("bugReportStatus", "Please describe the bug in at least 10 characters.");
-          return;
-        }
-
-        const reports = readJsonArray(STORAGE_KEYS.bugReports);
-        reports.unshift({
-          id: "BUG-" + Date.now(),
+        addRequest({
           type: "Bug Report",
-          name: name,
-          email: email,
-          category: category,
-          description: description,
-          status: "Pending",
-          page: location.href,
-          userAgent: navigator.userAgent || "",
-          createdAt: new Date().toISOString()
+          title: title,
+          details: details
         });
 
-        writeJsonArray(STORAGE_KEYS.bugReports, reports);
-
-        setStatus("bugReportStatus", "Bug report saved in this preview.");
-        toast("Bug report submitted.");
-
-        setTimeout(function () {
-          closeBugReportModal();
-        }, 800);
+        event.target.reset();
+        toast("Bug report saved locally.");
+        showPage("requestStatus");
       }
 
-      function formatDate(value) {
-        try {
-          return new Date(value).toLocaleString(undefined, {
-            year: "numeric",
-            month: "short",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit"
-          });
-        } catch (error) {
-          return "Recently";
+      function submitContactRequest(event) {
+        event.preventDefault();
+
+        const nameNode = qs("#contactName");
+        const methodNode = qs("#contactMethod");
+        const messageNode = qs("#contactMessage");
+
+        const name = clampText(nameNode ? nameNode.value : "", 60);
+        const method = clampText(methodNode ? methodNode.value : "", 20);
+        const message = clampText(messageNode ? messageNode.value : "", 600);
+
+        if (name.length < 2 || message.length < 8) {
+          toast("Please enter valid contact details.");
+          return;
         }
+
+        addRequest({
+          type: "Contact Request",
+          title: name + " - " + method,
+          details: message
+        });
+
+        event.target.reset();
+        toast("Contact request saved locally.");
+        showPage("requestStatus");
       }
 
-      function loadRequestStatus(showToast) {
-        const list = byId("requestStatusListAf");
-        const message = byId("requestStatusMessageAf");
+      function renderRequestStatus() {
+        const list = qs("#requestStatusList");
         if (!list) return;
 
-        const contactRequests = readJsonArray(STORAGE_KEYS.contactRequests);
-        const bugReports = readJsonArray(STORAGE_KEYS.bugReports);
-        const items = contactRequests.concat(bugReports).sort(function (a, b) {
-          return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
-        });
+        const requests = getRequests();
 
-        if (!items.length) {
-          list.innerHTML = "";
-          if (message) {
-            message.classList.add("show");
-            message.textContent = "No requests found in this preview. Submit a contact request or bug report first.";
-          }
-          if (showToast) toast("No requests found.");
+        if (!requests.length) {
+          list.innerHTML =
+            '<div class="placeholder-card">' +
+              '<h3>No requests yet</h3>' +
+              '<p>Bug reports and contact requests submitted from this preview will appear here.</p>' +
+            '</div>';
           return;
         }
 
-        if (message) {
-          message.classList.add("show");
-          message.textContent = "Showing locally saved preview requests.";
+        list.innerHTML = requests.map(function (request) {
+          return (
+            '<article class="request-card">' +
+              '<h3>' + escapeHtml(request.type) + '</h3>' +
+              '<p><strong>Title:</strong> ' + escapeHtml(request.title) + '</p>' +
+              '<p><strong>Status:</strong> ' + escapeHtml(request.status) + '</p>' +
+              '<p><strong>Date:</strong> ' + escapeHtml(request.createdAt) + '</p>' +
+              '<p>' + escapeHtml(request.details) + '</p>' +
+            '</article>'
+          );
+        }).join("");
+      }
+
+      function escapeHtml(value) {
+        return safeString(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function savePreviewLogin(event) {
+        event.preventDefault();
+
+        const nameNode = qs("#studentName");
+        const classNode = qs("#studentClass");
+
+        const name = clampText(nameNode ? nameNode.value : "", 60);
+        const studentClass = clampText(classNode ? classNode.value : "", 40);
+
+        if (name.length < 2 || studentClass.length < 1) {
+          toast("Please enter valid student details.");
+          return;
         }
 
-        list.innerHTML = items.map(function (item) {
-          const title = item.type || "Request";
-          const detail = item.reason || item.category || "General";
-          const status = item.status || "Pending";
-          const createdAt = formatDate(item.createdAt);
+        localStorage.setItem(
+          STORAGE_KEYS.student,
+          JSON.stringify({
+            name: name,
+            className: studentClass,
+            savedAt: new Date().toISOString()
+          })
+        );
 
-          return [
-            '<article class="request-card">',
-            '<h3>' + escapeHtml(title) + " · " + escapeHtml(status) + '</h3>',
-            '<p><strong>ID:</strong> ' + escapeHtml(item.id || "-") + '</p>',
-            '<p><strong>Type:</strong> ' + escapeHtml(detail) + '</p>',
-            '<p><strong>Date:</strong> ' + escapeHtml(createdAt) + '</p>',
-            '</article>'
-          ].join("");
-        }).join("");
-
-        if (showToast) toast("Request status refreshed.");
+        event.target.reset();
+        toast("Student ID saved locally.");
+        showPage("settings");
       }
 
-      function logoutStudent() {
-        localStorage.removeItem(STORAGE_KEYS.studentName);
-        localStorage.removeItem("student_name_af");
-        localStorage.removeItem("studentNameaf");
-        hydrateSettingsName();
-        toast("Logged out locally.");
+      function logoutPreview() {
+        localStorage.removeItem(STORAGE_KEYS.student);
+        toast("Local student session cleared.");
       }
 
-      function initTheme() {
-        const saved = localStorage.getItem(STORAGE_KEYS.theme);
-        const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-        applyTheme(saved || (prefersDark ? "dark" : "light"));
-        hydrateFontColor();
+      function setLanguage(languageCode) {
+        const safeCode = clampText(languageCode, 8).toLowerCase();
+
+        if (!/^[a-z]{2,3}$/.test(safeCode)) {
+          toast("Invalid language selected.");
+          return;
+        }
+
+        localStorage.setItem(STORAGE_KEYS.language, safeCode);
+
+        qsa(".language-link").forEach(function (link) {
+          link.classList.toggle("active", link.getAttribute("data-lang") === safeCode);
+        });
+
+        toast("Language preview updated.");
       }
 
-      function initKeyboardShortcuts() {
-        document.addEventListener("keydown", function (event) {
-          if (event.key === "Escape") {
-            closeBugReportModal();
-          }
+      function hydrateLanguage() {
+        const savedLanguage = safeString(localStorage.getItem(STORAGE_KEYS.language)) || "en";
+
+        qsa(".language-link").forEach(function (link) {
+          link.classList.toggle("active", link.getAttribute("data-lang") === savedLanguage);
         });
       }
 
-      function init() {
-        initTheme();
-        hydrateLanguage();
-        hydrateSettingsName();
-        setupBannerTouch();
-        startBannerAutoPlay();
-        initHistory();
-        initKeyboardShortcuts();
+      function getSlides() {
+        return qsa(".banner-slide");
       }
 
-      window.handleActionHref = function(event, fn) { if (event) event.preventDefault(); if (typeof fn === "function") fn(); };
-      window.handleLanguageHref = function(event, lang) { if (event) event.preventDefault(); setLanguage(lang); };
-      window.navigateTo = navigateTo;
-      window.showSection = navigateTo;
-      window.goBack = goBack;
-      window.handleNavHref = handleNavHref;
-      window.toggleDarkMode = toggleDarkMode;
-      window.setFontColor = setFontColor;
-      window.setLanguage = setLanguage;
-      window.goToBannerSlide = goToBannerSlide;
-      window.openStudentProfile = openStudentProfile;
-      window.openBugReportModal = openBugReportModal;
-      window.closeBugReportModal = closeBugReportModal;
-      window.submitContactRequest = submitContactRequest;
-      window.submitBugReport = submitBugReport;
-      window.loadRequestStatus = loadRequestStatus;
-      window.logoutStudent = logoutStudent;
+      function getDots() {
+        return qsa(".banner-dot");
+      }
+
+      function goToSlide(index) {
+        const slides = getSlides();
+        const dots = getDots();
+
+        if (!slides.length) return;
+
+        const nextIndex = ((Number(index) || 0) + slides.length) % slides.length;
+        slideIndex = nextIndex;
+
+        slides.forEach(function (slide, slidePosition) {
+          slide.classList.toggle("active", slidePosition === nextIndex);
+        });
+
+        dots.forEach(function (dot, dotPosition) {
+          dot.classList.toggle("active", dotPosition === nextIndex);
+        });
+
+        restartSlider();
+      }
+
+      function nextSlide() {
+        goToSlide(slideIndex + 1);
+      }
+
+      function restartSlider() {
+        clearInterval(sliderTimer);
+        sliderTimer = window.setInterval(nextSlide, 4200);
+      }
+
+      function initSliderTouch() {
+        const slider = qs("#homeBannerSlider");
+        if (!slider) return;
+
+        let startX = 0;
+        let startY = 0;
+        let isTouching = false;
+
+        slider.addEventListener("pointerdown", function (event) {
+          isTouching = true;
+          startX = event.clientX;
+          startY = event.clientY;
+        });
+
+        slider.addEventListener("pointerup", function (event) {
+          if (!isTouching) return;
+          isTouching = false;
+
+          const diffX = event.clientX - startX;
+          const diffY = event.clientY - startY;
+
+          if (Math.abs(diffX) < 38 || Math.abs(diffX) < Math.abs(diffY)) {
+            return;
+          }
+
+          if (diffX < 0) {
+            goToSlide(slideIndex + 1);
+          } else {
+            goToSlide(slideIndex - 1);
+          }
+        });
+
+        slider.addEventListener("pointercancel", function () {
+          isTouching = false;
+        });
+      }
+
+      function bindHashRouter() {
+        window.addEventListener("popstate", function () {
+          renderPage(getPageFromHash());
+        });
+
+        window.addEventListener("hashchange", function () {
+          renderPage(getPageFromHash());
+        });
+      }
+
+      function exposeGlobals() {
+        window.showPage = showPage;
+        window.goBack = goBack;
+        window.toggleTheme = toggleTheme;
+        window.setAppColour = setAppColour;
+        window.toggleAppColourPanel = toggleAppColourPanel;
+        window.setLanguage = setLanguage;
+        window.savePreviewLogin = savePreviewLogin;
+        window.submitBugReport = submitBugReport;
+        window.submitContactRequest = submitContactRequest;
+        window.logoutPreview = logoutPreview;
+        window.showPreviewBlocked = showPreviewBlocked;
+        window.goToSlide = goToSlide;
+      }
+
+      function boot() {
+        exposeGlobals();
+        hydrateTheme();
+        hydrateAppColour();
+        hydrateLanguage();
+        bindHashRouter();
+        initSliderTouch();
+        restartSlider();
+
+        const initialPage = getPageFromHash();
+        history.replaceState({ page: initialPage }, "", "#" + initialPage);
+        renderPage(initialPage);
+
+        isBooted = true;
+      }
 
       if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", init);
+        document.addEventListener("DOMContentLoaded", boot);
       } else {
-        init();
+        boot();
       }
     })();
   </script>
