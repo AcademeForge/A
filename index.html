@@ -1167,6 +1167,207 @@
         scroll-behavior: auto !important;
       }
     }
+    /* =========================================================
+   APP COLOUR FIX
+   Makes selected colour apply globally, not only body text.
+   Also makes colour options wrapped/collapsible like other settings.
+========================================================= */
+
+:root {
+  --af-app-color: var(--af-text);
+  --af-app-color-soft: color-mix(in srgb, var(--af-app-color) 12%, transparent);
+  --af-app-color-border: color-mix(in srgb, var(--af-app-color) 32%, var(--af-border));
+}
+
+body {
+  color: var(--af-app-color);
+}
+
+/* Force app text groups to follow selected colour */
+.brand-copy h1,
+.page-head h2,
+.placeholder-card h3,
+.settings-profile-info h2,
+.settings-row-title strong,
+.settings-color-panel h3,
+.settings-app-version-box strong,
+.action-card h3,
+.developer-credit-line span,
+.request-card h3,
+.language-btn,
+.nav-btn.active,
+.nav-link.active,
+.top-icon-btn,
+.back-btn,
+.app-btn,
+.mini-btn {
+  color: var(--af-app-color) !important;
+}
+
+/* Secondary text stays readable but follows selected colour softly */
+.brand-copy p,
+.page-head p,
+.placeholder-card p,
+.settings-row-title small,
+.settings-color-panel p,
+.settings-app-version-box span,
+.action-card p,
+.developer-credit-line small,
+.request-card p,
+.moving-text-track span,
+.field label,
+.status-message {
+  color: color-mix(in srgb, var(--af-app-color) 72%, var(--af-muted)) !important;
+}
+
+/* Icons, active states, outlines and selected controls */
+.settings-row-icon,
+.action-card .icon,
+.settings-avatar,
+.nav-icon,
+.settings-arrow,
+.settings-badge {
+  color: var(--af-app-color) !important;
+}
+
+.nav-btn.active,
+.nav-link.active,
+.color-choice.active {
+  border-color: var(--af-app-color-border) !important;
+  box-shadow:
+    0 0 0 1px var(--af-app-color-border),
+    var(--af-shadow-soft) !important;
+}
+
+.settings-beta-card,
+.app-btn.primary {
+  background: var(--af-app-color) !important;
+  border-color: var(--af-app-color) !important;
+  color: var(--af-primary-text) !important;
+}
+
+/* Keep black/white buttons readable when app colour is white/black */
+body.af-dark .settings-beta-card,
+body.af-dark .app-btn.primary {
+  color: #000000 !important;
+}
+
+body:not(.af-dark) .settings-beta-card,
+body:not(.af-dark) .app-btn.primary {
+  color: #ffffff !important;
+}
+
+body:not(.af-dark)[data-app-color="#ffffff"] .settings-beta-card,
+body:not(.af-dark)[data-app-color="#ffffff"] .app-btn.primary {
+  color: #000000 !important;
+}
+
+body.af-dark[data-app-color="#000000"] .settings-beta-card,
+body.af-dark[data-app-color="#000000"] .app-btn.primary {
+  color: #ffffff !important;
+}
+
+/* Collapsible app colour panel */
+.settings-color-panel {
+  margin-top: -12px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  transition:
+    max-height 0.22s ease,
+    opacity 0.18s ease,
+    padding 0.18s ease,
+    border-width 0.18s ease;
+}
+
+.settings-color-panel.collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-width: 0;
+  overflow: hidden;
+  margin-bottom: 0;
+}
+
+.settings-color-panel:not(.collapsed) {
+  max-height: 360px;
+  opacity: 1;
+  overflow: hidden;
+}
+
+#fontColorPanelArrow {
+  transition: transform 0.18s ease;
+}
+
+#fontColorPanelArrow.open {
+  transform: rotate(90deg);
+}
+
+/* Better colour buttons */
+.color-choice {
+  position: relative;
+  min-height: 42px;
+  border-radius: 14px;
+  border: 1px solid var(--af-border);
+  background: var(--af-surface-2);
+  color: var(--af-text);
+  font-size: 11px;
+  font-weight: 900;
+  overflow: hidden;
+}
+
+.color-choice::before {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  transform: translateY(-50%);
+  background: attr(data-color color, currentColor);
+  border: 1px solid var(--af-border);
+}
+
+.color-choice[data-color="#ffffff"]::before {
+  background: #ffffff;
+}
+
+.color-choice[data-color="#000000"]::before {
+  background: #000000;
+}
+
+.color-choice[data-color="#ef4444"]::before {
+  background: #ef4444;
+}
+
+.color-choice[data-color="#f97316"]::before {
+  background: #f97316;
+}
+
+.color-choice[data-color="#eab308"]::before {
+  background: #eab308;
+}
+
+.color-choice[data-color="#22c55e"]::before {
+  background: #22c55e;
+}
+
+.color-choice[data-color="#06b6d4"]::before {
+  background: #06b6d4;
+}
+
+.color-choice[data-color="#3b82f6"]::before {
+  background: #3b82f6;
+}
+
+.color-choice[data-color="#8b5cf6"]::before {
+  background: #8b5cf6;
+}
+
+.color-choice[data-color="#ec4899"]::before {
+  background: #ec4899;
+}
   </style>
 </head>
 
@@ -1493,24 +1694,44 @@
         </button>
       </div>
 
-      <div class="settings-color-panel">
-        <h3>Font Colour</h3>
-        <p>Default is black and white. Choose a temporary font colour if needed.</p>
+     <button
+  type="button"
+  class="settings-row"
+  onclick="toggleFontColorPanel()"
+  aria-label="Open App Colour Options"
+>
+  <div class="settings-row-left">
+    <span class="settings-row-icon" aria-hidden="true">C</span>
+    <div class="settings-row-title">
+      <strong>App Colour</strong>
+      <small>Change the full app text and accent colour.</small>
+    </div>
+  </div>
+  <span class="settings-arrow" id="fontColorPanelArrow" aria-hidden="true">›</span>
+</button>
 
-        <div class="color-grid">
-          <button type="button" class="color-choice" data-color="#000000" onclick="setFontColor('#000000')">Black</button>
-          <button type="button" class="color-choice" data-color="#ffffff" onclick="setFontColor('#ffffff')">White</button>
-          <button type="button" class="color-choice" data-color="#1f2937" onclick="setFontColor('#1f2937')">Slate</button>
-          <button type="button" class="color-choice" data-color="#374151" onclick="setFontColor('#374151')">Gray</button>
-          <button type="button" class="color-choice" data-color="#991b1b" onclick="setFontColor('#991b1b')">Red</button>
-          <button type="button" class="color-choice" data-color="#92400e" onclick="setFontColor('#92400e')">Amber</button>
-          <button type="button" class="color-choice" data-color="#166534" onclick="setFontColor('#166534')">Green</button>
-          <button type="button" class="color-choice" data-color="#1e40af" onclick="setFontColor('#1e40af')">Blue</button>
-          <button type="button" class="color-choice" data-color="#6d28d9" onclick="setFontColor('#6d28d9')">Violet</button>
-          <button type="button" class="color-choice" data-color="#be185d" onclick="setFontColor('#be185d')">Pink</button>
-        </div>
-      </div>
+<div
+  id="fontColorPanel"
+  class="settings-color-panel collapsed"
+  aria-hidden="true"
+>
+  <h3>Choose App Colour</h3>
+  <p>Default is black and white. Select any colour to apply it across the app.</p>
 
+  <div class="color-grid">
+    <button type="button" class="color-choice" data-color="#ffffff" onclick="setAppColor('#ffffff')">White</button>
+    <button type="button" class="color-choice" data-color="#000000" onclick="setAppColor('#000000')">Black</button>
+    <button type="button" class="color-choice" data-color="#ef4444" onclick="setAppColor('#ef4444')">Red</button>
+    <button type="button" class="color-choice" data-color="#f97316" onclick="setAppColor('#f97316')">Orange</button>
+    <button type="button" class="color-choice" data-color="#eab308" onclick="setAppColor('#eab308')">Yellow</button>
+    <button type="button" class="color-choice" data-color="#22c55e" onclick="setAppColor('#22c55e')">Green</button>
+    <button type="button" class="color-choice" data-color="#06b6d4" onclick="setAppColor('#06b6d4')">Cyan</button>
+    <button type="button" class="color-choice" data-color="#3b82f6" onclick="setAppColor('#3b82f6')">Blue</button>
+    <button type="button" class="color-choice" data-color="#8b5cf6" onclick="setAppColor('#8b5cf6')">Violet</button>
+    <button type="button" class="color-choice" data-color="#ec4899" onclick="setAppColor('#ec4899')">Pink</button>
+  </div>
+</div>
+      
       <div class="settings-support-list">
         <button
           type="button"
@@ -2106,27 +2327,71 @@
         toast(enabled ? "Night mode enabled." : "Light mode enabled.");
       }
 
-      function setFontColor(color) {
-        const safeColor = /^#[0-9a-f]{6}$/i.test(color) ? color : "#000000";
-        localStorage.setItem(STORAGE_KEYS.fontColor, safeColor);
-        document.documentElement.style.setProperty("--af-font-color", safeColor);
+function normalizeAppColor(color) {
+  const value = String(color || "").trim().toLowerCase();
+  return /^#[0-9a-f]{6}$/i.test(value) ? value : "";
+}
 
-        all(".color-choice").forEach(function (btn) {
-          btn.classList.toggle("active", btn.getAttribute("data-color") === safeColor);
-        });
+function getDefaultAppColor() {
+  return document.body.classList.contains("af-dark") ? "#ffffff" : "#000000";
+}
 
-        toast("Font colour updated.");
-      }
+function getReadableButtonTextColor(bgColor) {
+  const color = normalizeAppColor(bgColor) || getDefaultAppColor();
+  const hex = color.replace("#", "");
 
-      function hydrateFontColor() {
-        const fallback = document.body.classList.contains("af-dark") ? "#ffffff" : "#000000";
-        const saved = localStorage.getItem(STORAGE_KEYS.fontColor) || fallback;
-        document.documentElement.style.setProperty("--af-font-color", saved);
+  const r = parseInt(hex.slice(0, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
 
-        all(".color-choice").forEach(function (btn) {
-          btn.classList.toggle("active", btn.getAttribute("data-color") === saved);
-        });
-      }
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness > 150 ? "#000000" : "#ffffff";
+}
+
+function setAppColor(color) {
+  const safeColor = normalizeAppColor(color) || getDefaultAppColor();
+  const readableText = getReadableButtonTextColor(safeColor);
+
+  localStorage.setItem("af_font_color", safeColor);
+
+  document.documentElement.style.setProperty("--af-app-color", safeColor);
+  document.documentElement.style.setProperty("--af-font-color", safeColor);
+  document.documentElement.style.setProperty("--af-primary", safeColor);
+  document.documentElement.style.setProperty("--af-primary-text", readableText);
+
+  document.body.setAttribute("data-app-color", safeColor);
+
+  document.querySelectorAll(".color-choice").forEach(function (btn) {
+    btn.classList.toggle("active", btn.getAttribute("data-color") === safeColor);
+  });
+
+  if (typeof toast === "function") {
+    toast("App colour updated.");
+  }
+}
+
+function hydrateFontColor() {
+  const savedColor = normalizeAppColor(localStorage.getItem("af_font_color"));
+  const finalColor = savedColor || getDefaultAppColor();
+
+  setAppColor(finalColor);
+}
+
+function toggleFontColorPanel() {
+  const panel = document.getElementById("fontColorPanel");
+  const arrow = document.getElementById("fontColorPanelArrow");
+
+  if (!panel) return;
+
+  const isClosed = panel.classList.contains("collapsed");
+
+  panel.classList.toggle("collapsed", !isClosed);
+  panel.setAttribute("aria-hidden", isClosed ? "false" : "true");
+
+  if (arrow) {
+    arrow.classList.toggle("open", isClosed);
+  }
+}
 
       function setLanguage(language) {
         const allowed = new Set(["en", "hi", "ur", "bn", "ta"]);
